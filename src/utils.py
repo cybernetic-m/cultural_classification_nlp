@@ -26,7 +26,7 @@ def id2string(id_, client):
     #       - client: it is the wikidata client that get entity and properties
 
     element_ = client.get(id_, load=True)
-    print(element_)
+    print(element_.label)
 
 
     
