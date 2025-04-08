@@ -9,16 +9,13 @@ def dataset_parser(dataset):
     # Read the tsv file using a pandas dataframe
     df = pd.read_csv(dataset, sep='\t')
 
-    print("The dataset is:\n")
-    print(df.head(10))
-
     list_id = [] # A list of all wikidata id of the entities
     urls_col = df['item'] # select the column of each url
 
+    # Taking the url of each data and append to list_id the ID of the wikidata item (Ex. "Q307")
     for url in urls_col:
         single_id = url.split("/")[-1] 
-        list_id += single_id 
+        list_id.append(single_id) 
 
     return df, list_id
 
-#df = dataset_parser("./train_set.tsv")
