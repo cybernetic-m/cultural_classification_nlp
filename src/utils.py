@@ -49,7 +49,7 @@ def id2string(id_, client):
     #       - str that identify the identity or properties 
 
     element_ = client.get(id_, load=True)
-    return element_.label
+    return element_.label.get('en')
 
 def getEP(id_, client):
     prop_list = []
