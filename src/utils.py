@@ -21,7 +21,7 @@ def dataset_parser(dataset, client, list_dict):
     name_col = original_df['name'] # select the column of the label
 
     # Taking the url of each data and append to list_id the ID of the wikidata item (Ex. "Q307")
-    for url, label_ in urls_col, label_col:
+    for url, label_ in zip(urls_col, label_col):
         local_dict = {} # Initialization of a local dict void
         single_id = url.split("/")[-1] # "Q207"
         name_id = id2string(single_id, client) # "George W. Bush"
