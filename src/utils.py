@@ -36,7 +36,7 @@ def dataset_parser(dataset, client, list_dict):
                        }
             }
         list_dict.append(single_item_dict)
-        print(type(single_item_dict['name']))
+        print(type(single_item_dict[single_id]['name']))
 
     return original_df, list_dict
 
