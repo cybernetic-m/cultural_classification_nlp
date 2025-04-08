@@ -16,8 +16,9 @@ def dataset_parser(dataset):
     urls_col = df['item'] # select the column of each url
 
     for url in urls_col:
-        print(url)
+        single_id = url.split("/")[-1] 
+        list_id += single_id 
 
-    return df
+    return df, list_id
 
 #df = dataset_parser("./train_set.tsv")
