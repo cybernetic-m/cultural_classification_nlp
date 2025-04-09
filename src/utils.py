@@ -3,13 +3,14 @@ import json
 
 
 def dataset_parser(dataset, client):
+
 # Function to read the tsv dataset file and returning it as a pandas dataframe (and save it into a json file)
 # Args:
 #       - dataset: it is the tsv file containing the dataset
 #       - client: it is the wikidata client
 # Output:
 #       - original_df: it is the it is the original dataframe
-#       - my_df: 
+#       - my_df: return the dataframe modified with properties in one hot encoding mode
 
     # Read the tsv file using a pandas dataframe
     original_df = pd.read_csv(dataset, sep='\t')
@@ -53,6 +54,7 @@ def dataset_parser(dataset, client):
     return original_df
 
 def id2string(id_, client):
+
     # This function transform an ID (both for an entity of wikidata or a pid of a property) to the string
     # Args:
     #       - id: the identifier
@@ -64,9 +66,21 @@ def id2string(id_, client):
     return element_.label.get('en')
 
 def getEP(id_, client):
-    prop_list = []
-    prop_names_list = []
-    entity = client.get(id_, load=True)
+
+  # This function return the Entity and Property given one item id
+  # Args:
+  #       - id_: it is the id_ of the item (Ex. "Q207")
+  #       - client: it is the wikidata client
+  # Output:
+  #       - entity: it is the entity object
+  #       - prop_list: it is a list of all its properties id ["P207", ...]
+  #       - prop_names_list: it is a list of all its property names ["subclass of", ...]
+
+    prop_list = [] # Initialization of the list of properties id
+    prop_names_list = [] # Initialization of the list of properties names
+    entity = client.get(id_, load=True) # get the entity using wikidata
+
+    # Loop for selection of all properties
     for prop in entity.data['claims']:
         prop_list.append(prop)
         prop_name = id2string(prop, client)
@@ -75,12 +89,14 @@ def getEP(id_, client):
     return entity, prop_list, prop_names_list
 
 def dict_save_and_load(mydict, path, todo):
+
   # This function can save or load dictionaries in json format
   # Args:
-  #       - mydict: it is the python dictionary that you want to save (only needed if todo='save')
+  #       - mydict: it is the python dictionary that you want to save (only needed if todo=='save')
   #       - path: it is the wikidata client that get entity and properties
+  #       - todo: it can be 'load' in case of loading or 'save' in the case of saving
   # Output:
-  #       - str that identify the identity or properties
+  #       - mydict: in case of todo=='load', return the loaded dictionary
 
   if todo=="save":
     # Save it to a JSON file
