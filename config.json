@@ -1,5 +1,6 @@
 {
     "batch_size": 32,
     "lr": 1e-4,
-    "epochs": 10
+    "epochs": 10,
+    "language_model_name" : "distilbert-base-uncased"
 }
