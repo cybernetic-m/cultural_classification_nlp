@@ -1,5 +1,6 @@
 from datetime import datetime
 import os, sys
+import torch
 
 # Get the absolute paths of the directories containing the utils functions and train_one_epoch
 src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../src'))
@@ -12,8 +13,9 @@ sys.path.append(training_path)
 # Import section
 from calculate_metrics import calculate_metrics
 from train_one_epoch import train_one_epoch
+from utils import dict_save_and_load
 
-def train(num_epochs, model, train_dataloader, val_dataloader, train_metrics_dict, val_metrics_dict, optimizer, loss_fn):
+def train(num_epochs, model, train_dataloader, val_dataloader, train_metrics_dict, val_metrics_dict, optimizer, loss_fn, device):
 
   # Create a new directory for this training with the path ./training_2025-04-11_14-38
   current_time = datetime.now().strftime("%Y-%m-%d_%H-%M")
