@@ -2,6 +2,6 @@
     "batch_size": 128,
     "lr": 1e-4,
     "epochs": 10,
-    "language_model_name" : "roberta",
+    "language_model_name" : "prajjwal1/bert-mini",
     "max_length": 256
 }
