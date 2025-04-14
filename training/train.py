@@ -15,7 +15,7 @@ from calculate_metrics import calculate_metrics
 from train_one_epoch import train_one_epoch
 from utils import dict_save_and_load
 
-def train(num_epochs, model, train_dataloader, val_dataloader, train_metrics_dict, val_metrics_dict, optimizer, loss_fn, device):
+def train(num_epochs, model, train_dataloader, val_dataloader, train_metrics_dict, val_metrics_dict, optimizer, loss_fn, device, config_dict):
 
   # Create a new directory for this training with the path ./training_2025-04-11_14-38
   current_time = datetime.now().strftime("%Y-%m-%d_%H-%M")
@@ -59,3 +59,4 @@ def train(num_epochs, model, train_dataloader, val_dataloader, train_metrics_dic
 
   dict_save_and_load(train_dict_list, training_dir + '/train_metrics_dict.json', todo='save')
   dict_save_and_load(val_dict_list, training_dir + '/val_metrics_dict.json', todo='save')
+  dict_save_and_load(config_dict, training_dir + '/hyperparams.json', todo='save')
