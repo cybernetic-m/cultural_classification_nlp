@@ -65,6 +65,7 @@ def train(num_epochs, model, train_dataloader, val_dataloader, train_metrics_dic
     if vloss_epoch < best_vloss:
       best_vloss = vloss_epoch
       torch.save(model.state_dict(), training_dir + '/best_model.pt')
+      print("Model saved!")
 
     print("VALIDATION:")
     print(f"loss: {vloss_epoch}  accuracy: {validation_metrics_dict['accuracy']}  precision:{validation_metrics_dict['precision']}  recall:{validation_metrics_dict['recall']}  f1-score: {validation_metrics_dict['f1']}")
