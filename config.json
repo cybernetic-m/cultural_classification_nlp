@@ -3,5 +3,5 @@
     "lr": 1e-4,
     "epochs": 10,
     "language_model_name" : "prajjwal1/bert-mini",
-    "max_length": 128
+    "max_length": 64
 }
