@@ -26,6 +26,7 @@ def train(num_epochs, model, train_dataloader, val_dataloader, train_metrics_dic
   train_dict_list = [] # a list to save all the training metrics dictionaries (1 for each epoch)
   val_dict_list = [] # a list to save all the validation metrics dictionaries (1 for each epoch)
   time_epochs = [] # a list of each epoch training time
+  time_dict = {} # Dictionary to save in JSON file total time and avg time
 
   best_vloss = 10000000000 # Set an high validation loss as start to save the best model
 
@@ -68,13 +69,19 @@ def train(num_epochs, model, train_dataloader, val_dataloader, train_metrics_dic
     print("VALIDATION:")
     print(f"loss: {vloss_epoch}  accuracy: {validation_metrics_dict['accuracy']}  precision:{validation_metrics_dict['precision']}  recall:{validation_metrics_dict['recall']}  f1-score: {validation_metrics_dict['f1']}")
 
-  # Save training, validation dictionaries of the whole training and also the config file with all the hyperparams of the model
+  # Compute also the total training time and the average per epoch 
+  time_dict['total_training_time'] = sum(time_epochs) 
+  time_dict ['avg_epoch_training_time'] = sum(time_epochs) / num_epochs
+
+  # Save training, validation dictionaries of the whole training 
+  # the config file with all the hyperparams of the model
+  # the time data (total time and average time)
   dict_save_and_load(train_dict_list, training_dir + '/train_metrics_dict.json', todo='save')
   dict_save_and_load(val_dict_list, training_dir + '/val_metrics_dict.json', todo='save')
   dict_save_and_load(config_dict, training_dir + '/hyperparams.json', todo='save')
+  dict_save_and_load(time_dict, training_dir + '/time.json', todo='save')
 
-  # Compute also the total training time and the average per epoch (returned)
-  total_training_time = sum(time_epochs)
-  avg_epoch_training_time = total_training_time / num_epochs
 
-  return total_training_time, avg_epoch_training_time
+
+  
+
