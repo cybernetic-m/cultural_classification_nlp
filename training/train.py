@@ -61,14 +61,14 @@ def train(num_epochs, model, train_dataloader, val_dataloader, train_metrics_dic
     validation_metrics_dict['loss'] = vloss_epoch
     val_dict_list.append(val_metrics_dict.copy())
 
+    print("VALIDATION:")
+    print(f"loss: {vloss_epoch}  accuracy: {validation_metrics_dict['accuracy']}  precision:{validation_metrics_dict['precision']}  recall:{validation_metrics_dict['recall']}  f1-score: {validation_metrics_dict['f1']}")
+
     # save the best model in terms of loss
     if vloss_epoch < best_vloss:
       best_vloss = vloss_epoch
       torch.save(model.state_dict(), training_dir + '/best_model.pt')
       print("Model saved!")
-
-    print("VALIDATION:")
-    print(f"loss: {vloss_epoch}  accuracy: {validation_metrics_dict['accuracy']}  precision:{validation_metrics_dict['precision']}  recall:{validation_metrics_dict['recall']}  f1-score: {validation_metrics_dict['f1']}")
 
   # Compute also the total training time and the average per epoch 
   time_dict['total_training_time'] = sum(time_epochs) 
