@@ -38,7 +38,7 @@ def test(model, model_path, test_dataloader, test_metrics_dict, loss_fn, device)
   time_dict = {}
 
   # Loop for evaluate the model
-  for i, data in enumerate(tqdm(test_dataloader, desc="Testing", leave=False)):
+  for _, data in enumerate(tqdm(test_dataloader, desc="Testing", leave=False)):
 
     # Read the input_ids and attention_mask from the dataloader
     input_ids_i = data['input_ids'].to(device) 

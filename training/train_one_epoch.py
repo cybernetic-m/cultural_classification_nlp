@@ -7,7 +7,7 @@ def train_one_epoch(model, dataloader, optimizer, loss_fn, device, train_mode=Tr
   y_true_list = [] # List used for append all the true labels to compute metrics in train function
   y_pred_list = [] # List used for append all the pred labels to compute metrics in train function
 
-  for i, data in enumerate(tqdm(dataloader, desc='batch passing...', leave=False)):
+  for _, data in enumerate(tqdm(dataloader, desc='batch passing...', leave=False)):
     
     # Extract the input_ids and the attention_mask tensors of the ith batch
     input_ids_i = data['input_ids'].to(device)
