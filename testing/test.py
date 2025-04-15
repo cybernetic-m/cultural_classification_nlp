@@ -44,7 +44,7 @@ def test(model, model_path, test_dataloader, test_metrics_dict, loss_fn, device)
     attention_mask_i = data['attention_mask'].to(device)
 
     # Store the y_true and compute y_pred 
-    y_true = data['labels'].to(device)
+    y_true = data['label'].to(device)
     start_time = time.time()
 
     with torch.no_grad():
