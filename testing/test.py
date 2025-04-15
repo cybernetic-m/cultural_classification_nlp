@@ -4,6 +4,7 @@ import torch
 import time
 import seaborn as sns
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 # Get the absolute paths of the directories containing the utils functions and train_one_epoch
 src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../src'))
@@ -30,14 +31,14 @@ def test(model, model_path, test_dataloader, test_metrics_dict, loss_fn, device)
   model.eval()
 
   # Initialization of loss and lists for y_pred, y_true and the inference time
-  test_loss = 0
+  test_loss_batch = 0
   y_true_list = []
   y_pred_list = []
   inference_time_list = []
   time_dict = {}
 
   # Loop for evaluate the model
-  for i, data in enumerate(test_dataloader):
+  for i, data in enumerate(tqdm(test_dataloader, desc="Testing", leave=False)):
 
     # Read the input_ids and attention_mask from the dataloader
     input_ids_i = data['input_ids'].to(device) 
@@ -77,7 +78,7 @@ def test(model, model_path, test_dataloader, test_metrics_dict, loss_fn, device)
   dict_save_and_load(time_dict, test_dir + '/time.json', todo='save')
 
   # Transform the confusion matrix to a pandas dataframe
-  labels = ['cultural agnostic', 'cultural representative', 'cultural exclusive']
+  labels = ['C.A.', 'C.R.', 'C.E.']
   cm_df = pd.DataFrame(confusion_matrix, index=labels, columns=labels)
 
   # Save the confusion matrix in a csv file
@@ -89,12 +90,9 @@ def test(model, model_path, test_dataloader, test_metrics_dict, loss_fn, device)
   print("Confusion Matrix:")
 
   plt.figure(figsize=(6, 5))
-  sns.heatmap(cm_df, annot=True, fmt="d", cmap="Red")
+  sns.heatmap(cm_df, annot=True, fmt="d", cmap="Blues")
   plt.title("Confusion Matrix")
   plt.ylabel("True Label")
   plt.xlabel("Predicted Label")
   plt.tight_layout()
-  plt.savefig("confusion_matrix.png")  
-
-
-
+  plt.savefig("confusion_matrix.png") 
