@@ -66,7 +66,6 @@ def test(model, model_path, test_dataloader, test_metrics_dict, loss_fn, device)
 
   # Compute also the total training time and the average per epoch 
   time_dict['total_training_time'] = sum(inference_time_list) 
-  print(len(inference_time_list)) 
   time_dict ['avg_epoch_training_time'] = sum(inference_time_list) / len(inference_time_list)
 
   test_metrics_dict, confusion_matrix = calculate_metrics(y_true_list, y_pred_list, test_metrics_dict) 
@@ -91,9 +90,9 @@ def test(model, model_path, test_dataloader, test_metrics_dict, loss_fn, device)
   print("Confusion Matrix:")
 
   plt.figure(figsize=(6, 5))
-  sns.heatmap(cm_df, annot=True, fmt="d", cmap="Blues")
+  sns.heatmap(cm_df, annot=True, fmt="d", cmap="Purples")
   plt.title("Confusion Matrix")
   plt.ylabel("True Label")
   plt.xlabel("Predicted Label")
   plt.tight_layout()
-  plt.savefig("confusion_matrix.png") 
+  plt.savefig(test_dir + "/confusion_matrix.png") 
