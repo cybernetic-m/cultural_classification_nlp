@@ -39,11 +39,11 @@ def test(model, model_path, test_dataloader, test_metrics_dict, loss_fn, device)
 
   # Loop for evaluate the model
   for _, data in enumerate(tqdm(test_dataloader, desc="Testing", leave=False)):
-
+    
     # Read the input_ids and attention_mask from the dataloader
     input_ids_i = data['input_ids'].to(device) 
     attention_mask_i = data['attention_mask'].to(device)
-
+    
     # Store the y_true and compute y_pred 
     y_true = data['label'].to(device)
     start_time = time.time()
@@ -66,9 +66,10 @@ def test(model, model_path, test_dataloader, test_metrics_dict, loss_fn, device)
 
   # Compute also the total training time and the average per epoch 
   time_dict['total_training_time'] = sum(inference_time_list) 
-  time_dict ['avg_epoch_training_time'] = sum(inference_time_list) / num_epochs
+  print(len(inference_time_list)) 
+  time_dict ['avg_epoch_training_time'] = sum(inference_time_list) / len(inference_time_list)
 
-  test_metrics_dict, confusion_matrix = calculate_metrics(y_true_list, y_pred_list, train_metrics_dict) 
+  test_metrics_dict, confusion_matrix = calculate_metrics(y_true_list, y_pred_list, test_metrics_dict) 
   test_metrics_dict['loss'] = test_loss
 
   # Save training, validation dictionaries of the whole training 
