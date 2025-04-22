@@ -1,7 +1,7 @@
 from torch.utils.data import Dataset
 
 class CulturalDataset(Dataset):
-  def __init__(self, dataset, tokenizer, max_length, text_type='basic'):
+  def __init__(self, dataset, tokenizer, max_length, text_type='ND'):
     super(CulturalDataset, self).__init__()
 
     self.dataset = dataset # Pandas dataframe with cultural data
