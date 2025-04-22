@@ -240,26 +240,19 @@ def add_wikipedia_data(df, save_path, lang='en', max_workers=10):
     summ_col = [np.nan] * len(df) # create a list of dimension df (the rows) empty (with NaN) to save the summary
 
 
-    # Start a thread pool: it means that we run a collection of threads (multiple path of instructions inside the same program) 
-    # to run tasks in parallel. The executor is the manager of threads.
+    # Start a thread pool: it means that we run a collection of threads (multiple path of instructions inside the same program) to run tasks in parallel 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        # the futures dictionary is needed to match the row with the "Future" object created by executor.submit
-        # futures = {futureobj_0: 0, futureobj_1: 1, ....}
-        # Each futureobj_i starts running its task (process_row(row, lang) on a separate thread in parallel to the others
-        # it is an object like a "ticket" (promise) -> when the thread is completed it will return the result with future.result()
-        # the futures dictionary is like giving a ticket to each worker, then when the worker has finished its task we recognise the worker
+        # 
         futures = {
             executor.submit(process_row, row, lang): i
             for i, row in df.iterrows()
         }
 
-        # as_completed return a future object that has finished its works and become "future"
-        for future in tqdm(as_completed(futures), total=len(futures), desc="Adding Wikipedia views..."):
-            idx = futures[future] # return the i of the previous dictionary
+        for future in tqdm(as_completed(futures), total=len(futures), desc="Adding Wikipedia data..."):
+            idx = futures[future]
             try:
-                views, summary = future.result() # take the result when the thread is completed
-                # save the results
-                views_col[idx] = views 
+                views, summary = future.result()
+                views_col[idx] = views
                 summ_col[idx] = summary
             except Exception as e:
                 print(f"[Index {idx}] Error: {e}")
