@@ -1,23 +1,30 @@
 from torch.utils.data import Dataset
 
 class CulturalDataset(Dataset):
-  def __init__(self, dataset, tokenizer, max_length):
+  def __init__(self, dataset, tokenizer, max_length, text_type='basic'):
     super(CulturalDataset, self).__init__()
 
     self.dataset = dataset # Pandas dataframe with cultural data
     self.tokenizer = tokenizer # the type of tokenizer
     self.max_length = max_length # the length maximum of each tokenized output
+    # it is the type of text in output 
+    # ('ND' [Name and Description], 'NDV' [Name, Description, Views], 'NDVS' [Name, Description, Views and Summary])
+    # Views are the wikipedia page views, while Summary is a Wikipedia page summary
+    self.text_type = text_type 
 
   def __len__(self):
     return len(self.dataset)
 
   def __getitem__(self, index):
     item = self.dataset.iloc[index] # take the ith row from the dataset pandas dataframe
-
+    
     # Construct a unique sentence with all the features in the dataset to give to BERT encoder
-    #text = f"The item '{item['name']}' is a '{item['type']}' in the '{item['category']}' category. Description: '{item['description']}'"
-    text = f"'{item['name']}''{item['description']}'"
-    #text = f"The item is '{item['name']}'"
+    if self.text_type == 'ND':
+      text = f"Name: {item['name']}.Description: {item['description']}"
+    elif self.text_type == 'NDV':
+      text = f"Name: {item['name']}.Description: {item['description']}. Views: {item['en_wikipedia_views']}"
+    elif self.text_type == 'NDVS':
+      text = f"Name: {item['name']}.Description: {item['description']}. Views: {item['en_wikipedia_views']}. Summary: {item['en_wikipedia_summary']}"
 
     # Put label as 0,1,2
     if item['label'] == 'cultural agnostic':
