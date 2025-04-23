@@ -7,11 +7,11 @@ import json
 #-------------------------------------#
 def save_encoder(encoder, name):
   # Save category_encoder
-  with open(f'{name}.pkl', 'wb') as f:
+  with open(f'../models/{name}.pkl', 'wb') as f:
       pickle.dump(encoder, f)
 
 def load_encoder(name):
-  with open(f'{name}.pkl', 'rb') as f:
+  with open(f'../models/{name}.pkl', 'rb') as f:
       return pickle.load(f)
   
 #-------------------------------------#
@@ -25,7 +25,7 @@ def save_graph(G, filename):
         json.dump(data, f, indent=4)  # Save as JSON
  
 def load_graph(filename):
-    with open(filename, 'r') as f:
+    with open(f'../models/{filename}', 'r') as f:
         data = json.load(f)  # Load JSON data
     G = nx.node_link_graph(data, edges="links")  # Reconstruct the graph
     return G
