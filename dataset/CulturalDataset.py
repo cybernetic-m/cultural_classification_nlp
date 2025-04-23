@@ -20,11 +20,11 @@ class CulturalDataset(Dataset):
     
     # Construct a unique sentence with all the features in the dataset to give to BERT encoder
     if self.text_type == 'ND':
-      text = f"Name: {item['name']}.Description: {item['description']}"
+      text = f"Name: {item['name']}. Description: {item['description']}"
     elif self.text_type == 'NDV':
-      text = f"Name: {item['name']}.Description: {item['description']}. Views: {item['en_wikipedia_views']}"
+      text = f"Name: {item['name']}. Description: {item['description']}. Views: {item['en_wikipedia_views']}"
     elif self.text_type == 'NDVS':
-      text = f"Name: {item['name']}.Description: {item['description']}. Views: {item['en_wikipedia_views']}. Summary: {item['en_wikipedia_summary']}"
+      text = f"Name: {item['name']}. Description: {item['description']}. Views: {item['en_wikipedia_views']}. Summary: {item['en_wikipedia_summary']}"
 
     # Put label as 0,1,2
     if item['label'] == 'cultural agnostic':
