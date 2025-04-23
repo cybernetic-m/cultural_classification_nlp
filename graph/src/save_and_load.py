@@ -1,7 +1,7 @@
 import pickle
 import networkx as nx
 import json 
-
+import os
 #-------------------------------------#
 # Functions to save and load the Label Encoder
 #-------------------------------------#
@@ -25,7 +25,12 @@ def save_graph(G, filename):
         json.dump(data, f, indent=4)  # Save as JSON
  
 def load_graph(filename):
-    with open(f'../models/{filename}', 'r') as f:
+    script_dir = os.path.dirname(os.path.abspath(__file__))  # cartella dove si trova il file .py
+    model_path = os.path.join(script_dir, '..', 'models', filename)
+    model_path = os.path.normpath(model_path)  # normalizza il percorso
+
+    print("Carico da:", model_path)  # utile per debug
+    with open(model_path, 'r') as f:
         data = json.load(f)  # Load JSON data
     G = nx.node_link_graph(data, edges="links")  # Reconstruct the graph
     return G
