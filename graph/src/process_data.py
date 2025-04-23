@@ -112,7 +112,7 @@ def parse_df_properties(dataset, client):
     data_tuples = list(zip(urls_col, name_col, label_col))
 
     with ThreadPoolExecutor(max_workers=16) as executor:
-        list_dict = list(tqdm(executor.map(process_item, data_tuples, client, label_map), total=len(data_tuples), desc="Parsing dataset properties..."))
+        list_dict = list(tqdm(executor.map(lambda args: process_item(args, client, label_map), data_tuples), total=len(data_tuples), desc="Parsing dataset properties..."))
 
     my_df = dict2pd(list_dict)
 
