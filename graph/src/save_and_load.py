@@ -11,8 +11,13 @@ def save_encoder(encoder, name):
       pickle.dump(encoder, f)
 
 def load_encoder(name):
-  with open(f'../models/{name}.pkl', 'rb') as f:
-      return pickle.load(f)
+    script_dir = os.path.dirname(os.path.abspath(__file__))  # cartella dove si trova il file .py
+    model_path = os.path.join(script_dir, '..', 'models', name)
+    model_path = os.path.normpath(model_path)  # normalizza il percorso
+
+    print("Carico da:", model_path)  # utile per debug
+    with open(model_path, 'rb') as f:
+          return pickle.load(f)
   
 #-------------------------------------#
 # Functions to save and load the graph
