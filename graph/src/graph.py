@@ -14,7 +14,7 @@ def make_graph(G, df, add_label):
   #binary_props = set(binary_props)
 
   if not set(cols).issubset(set(df.columns)):
-    print(f"Missing required columns: {cols - set(df.columns)}")
+    print(f"Missing required columns: {set(cols) - set(df.columns)}")
 
 
   for _, row in df.iterrows():
