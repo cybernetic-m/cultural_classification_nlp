@@ -13,7 +13,7 @@ def make_graph(G, df, add_label):
   split_val = 2000
   #binary_props = set(binary_props)
 
-  if not set(cols).issubset(df.columns):
+  if not set(cols).issubset(set(df.columns)):
     print(f"Missing required columns: {cols - set(df.columns)}")
 
 
