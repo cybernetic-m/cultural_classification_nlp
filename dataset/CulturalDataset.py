@@ -51,4 +51,4 @@ class CulturalDataset(Dataset):
     )
 
     # The squeeze is needed to transform the tensor [1, 512] -> [512] eliminating the first useless dimension
-    return {"input_ids":tokens['input_ids'].squeeze(0), "attention_mask":tokens['attention_mask'].squeeze(0), "label":label}
+    return {"input_ids":tokens['input_ids'].squeeze(0), "attention_mask":tokens['attention_mask'].squeeze(0), "label":label, "text": text}
