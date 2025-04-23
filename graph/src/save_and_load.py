@@ -16,7 +16,7 @@ def load_encoder(name):
     model_path = os.path.normpath(model_path)  # normalizza il percorso
 
     print("Carico da:", model_path)  # utile per debug
-    with open(model_path, 'rb') as f:
+    with open(f'{model_path}.pkl', 'rb') as f:
           return pickle.load(f)
   
 #-------------------------------------#
@@ -35,7 +35,7 @@ def load_graph(filename):
     model_path = os.path.normpath(model_path)  # normalizza il percorso
 
     print("Carico da:", model_path)  # utile per debug
-    with open(model_path, 'r') as f:
+    with open(f'{model_path}.json', 'r') as f:
         data = json.load(f)  # Load JSON data
     G = nx.node_link_graph(data, edges="links")  # Reconstruct the graph
     return G
