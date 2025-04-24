@@ -119,7 +119,7 @@ def eval_lm(model, model_path, dataset_csv, tokenizer, batch_size, max_length, t
   df = pd.read_csv(dataset_csv)
   
   # Add Wikipedia data
-  df_wikipedia = add_wikipedia_data(df, save_path='./', lang='en', max_workers=5)
+  df_wikipedia = add_wikipedia_data(df, lang='en', max_workers=5)
 
   # Create the dataloader for the test set
   test_dataset = CulturalDataset(df_wikipedia, tokenizer = tokenizer, max_length = max_length, text_type='NDVS')

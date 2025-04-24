@@ -138,7 +138,7 @@ def process_row(row, lang='en', start='20240101', end='20250101', retries=5, del
         return np.nan
 
 
-def add_wikipedia_data(df, save_path, lang='en', max_workers=10):
+def add_wikipedia_data(df, save_path=None, lang='en', max_workers=10):
     
       # This function take a dataframe and return a dataframe with a column with the wikipedia page views and a column with the wikipedia summary
       # Args:
@@ -174,7 +174,10 @@ def add_wikipedia_data(df, save_path, lang='en', max_workers=10):
     # Add the two new columns with wikipedia views and summary
     df_wikipedia[f'{lang}_wikipedia_views'] = views_col
     df_wikipedia[f'{lang}_wikipedia_summary'] = summ_col
-
-    # Save the new dataframe in csv format
-    df_wikipedia.to_csv(save_path, index=False)
+    if save_path is None:
+       print("No save path provided. The dataframe will not be saved.")
+    else:
+      # Save the new dataframe in csv format
+      print("Saving the dataframe in csv format at the path: ", save_path)
+      df_wikipedia.to_csv(save_path, index=False)
     return df_wikipedia
