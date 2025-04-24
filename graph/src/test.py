@@ -17,9 +17,9 @@ src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../src'))
 # Add these directories to sys.path
 sys.path.append(src_path)
 
-from graph.src.graph import make_graph, prepare_data
-from graph.src.process_data import process_df
-from graph.src.save_and_load import load_graph
+from graph import make_graph, prepare_data
+from process_data import process_df
+from save_and_load import load_graph
 
 
 def test(A, y, node_idx, X_test, y_test, kernel, gamma, n_neighbors, print_statistics):
