@@ -104,10 +104,6 @@ def test(model, model_path, test_dataloader, test_metrics_dict, loss_fn, device)
 
 def eval_lm(model, model_path, dataset_csv, tokenizer, batch_size, max_length, test_metrics_dict, loss_fn, device):
   
-  if dataset_csv is None:
-    print("No dataset provided.\n Please load it in a csv format into the 'Files' section of colab.\n After this, run another time the cells of 'Load of the dataset'.")
-    return
-  
   # Load the model weights from a pt file
   model.load_state_dict(torch.load(model_path, map_location=device)) 
 
@@ -117,6 +113,10 @@ def eval_lm(model, model_path, dataset_csv, tokenizer, batch_size, max_length, t
   # Values to Label
   val_to_lab = {0: 'Cultural agnostic', 1: 'Cultural representative.', 2: 'Cultural exclusive'}
 
+  if not os.path.exists(dataset_csv):
+    print("No dataset provided.\n Please load it in a csv format into the 'Files' section of colab.\n After this, run another time the cells of 'Load of the dataset'.")
+    return
+  
   # Transform csv of the dataset into a pandas dataframe
   df = pd.read_csv(dataset_csv)
   
