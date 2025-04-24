@@ -104,11 +104,13 @@ def test(model, model_path, test_dataloader, test_metrics_dict, loss_fn, device)
 
 def eval_lm(model, model_path, dataset_csv, tokenizer, batch_size, max_length, test_metrics_dict, loss_fn, device):
   
+  '''
   # Load the model weights from a pt file
   model.load_state_dict(torch.load(model_path, map_location=device)) 
 
   # Set the model in evaluation mode
   model.eval()
+  '''
 
   # Values to Label
   val_to_lab = {0: 'Cultural agnostic', 1: 'Cultural representative.', 2: 'Cultural exclusive'}
