@@ -124,7 +124,9 @@ def parse_df_properties(dataset, client):
     data_tuples = list(zip(urls_col, name_col, label_col))
 
     with ThreadPoolExecutor(max_workers=16) as executor:
-        results = list(tqdm(executor.map(process_item, data_tuples), total=len(data_tuples), desc="Parsing dataset..."))
+        results = list(tqdm(executor.map(process_item, data_tuples, client, label_map), total=len(data_tuples),
+                              desc="Parsing dataset properties..."))
+
         list_dict = [result for result in results if result is not None]  # Exclude None results
 
     my_df = dict2pd(list_dict)
