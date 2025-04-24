@@ -111,7 +111,7 @@ def eval_lm(model, model_path, dataset_csv, tokenizer, batch_size, max_length, t
   model.eval()
   
   # Values to Label
-  val_to_lab = {0: 'Cultural agnostic', 1: 'Cultural representative.', 2: 'Cultural exclusive'}
+  val_to_lab = {0: 'cultural agnostic', 1: 'cultural representative.', 2: 'cultural exclusive'}
 
   if not os.path.exists(dataset_csv):
     print("No dataset provided.\nPlease load it in a csv format into the 'Files' section of colab.\nAfter this, run another time the cells of 'Load of the dataset'.")
@@ -161,9 +161,12 @@ def eval_lm(model, model_path, dataset_csv, tokenizer, batch_size, max_length, t
 
   test_loss = test_loss_batch / len(test_dataloader) # average for all the batches
 
+  # Eliminate columns of wikipedia
+  df_wikipedia = df_wikipedia.drop(columns=['en_wikipedia_views', 'en_wikipedia_summary'])
+
   # Add another column in the dataframe with all the predictions in strings
   df_wikipedia['predicted_label'] = [val_to_lab[i] for i in y_pred_list]
-
+  
   # Save in csv format the dataframe with the predictions
   df_wikipedia.to_csv("./predictions.csv", index=False)
 
