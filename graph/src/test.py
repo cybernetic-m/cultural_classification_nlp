@@ -7,7 +7,7 @@ from sklearn.metrics import (
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.semi_supervised import LabelPropagation
-
+import pandas as pd
 
 def test(A, y, node_idx, X_test, y_test, kernel, gamma, n_neighbors, print_statistics):
     predictions_df = pd.DataFrame({'qid': X_test})  # Create DataFrame
