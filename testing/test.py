@@ -104,6 +104,9 @@ def test(model, model_path, test_dataloader, test_metrics_dict, loss_fn, device)
 
 def eval_lm(model, model_path, dataset_csv, tokenizer, batch_size, max_length, test_metrics_dict, loss_fn, device):
   
+  if dataset_csv is None:
+    print("No dataset provided.\n Please load it in a csv format into the 'Files' section of colab.\n After this, run another time the cells of 'Load of the dataset'.")
+    return
   
   # Load the model weights from a pt file
   model.load_state_dict(torch.load(model_path, map_location=device)) 
@@ -111,7 +114,6 @@ def eval_lm(model, model_path, dataset_csv, tokenizer, batch_size, max_length, t
   # Set the model in evaluation mode
   model.eval()
   
-
   # Values to Label
   val_to_lab = {0: 'Cultural agnostic', 1: 'Cultural representative.', 2: 'Cultural exclusive'}
 
@@ -160,7 +162,7 @@ def eval_lm(model, model_path, dataset_csv, tokenizer, batch_size, max_length, t
   test_loss = test_loss_batch / len(test_dataloader) # average for all the batches
 
   # Add another column in the dataframe with all the predictions in strings
-  df_wikipedia['predicted_label'] = y_pred_list.map(val_to_lab)
+  df_wikipedia['predicted_label'] = [val_to_lab[i] for i in y_pred_list]
 
   # Save in csv format the dataframe with the predictions
   df_wikipedia.to_csv("./predictions.csv", index=False)
