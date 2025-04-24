@@ -9,6 +9,14 @@ import seaborn as sns
 from sklearn.semi_supervised import LabelPropagation
 import pandas as pd
 
+
+import os, sys
+# Get the absolute paths of the directories containing the utils functions and train_one_epoch
+src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../src'))
+
+# Add these directories to sys.path
+sys.path.append(src_path)
+
 from graph.src.graph import make_graph, prepare_data
 from graph.src.process_data import process_df
 from graph.src.save_and_load import load_graph
