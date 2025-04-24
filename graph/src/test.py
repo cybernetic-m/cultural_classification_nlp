@@ -10,7 +10,9 @@ from sklearn.semi_supervised import LabelPropagation
 import pandas as pd
 
 def test(A, y, node_idx, X_test, y_test, kernel, gamma, n_neighbors, print_statistics):
-    predictions_df = pd.DataFrame({'qid': X_test})  # Create DataFrame
+    predictions_df = pd.DataFrame({'qid': X_test})
+
+    labels_to_int = {"cultural exclusive": 0, "cultural representative": 1, "cultural agnostic": 2}
 
     # 6. Applica Label Propagation di sklearn
     lp_model = LabelPropagation(kernel=kernel,  # oppure 'knn'
@@ -34,6 +36,10 @@ def test(A, y, node_idx, X_test, y_test, kernel, gamma, n_neighbors, print_stati
 
     predictions_df['y_pred'] = y_pred
 
+    int_to_labels = {v: k for k, v in labels_to_int.items()}
+
+    final_df = predictions_df[['qid']].copy()
+    final_df['label'] = predictions_df['predicted_label'].map(int_to_labels)
 
     # 8. Accuracy
     acc = accuracy_score(y_true, y_pred)
@@ -59,6 +65,6 @@ def test(A, y, node_idx, X_test, y_test, kernel, gamma, n_neighbors, print_stati
         print("\nClassification Report:")
         print(classification_report(y_true, y_pred, digits=4))
 
-    return predictions_df, acc
+    return final_df, acc
 
 # MIGLIORE NN = 10: 0.73 CON SPLIT_VAL=2000
