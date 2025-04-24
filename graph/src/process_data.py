@@ -41,7 +41,14 @@ def cached_id2string(id_, client):
 def getEP_cached(id_, client):
     prop_list = []
     prop_names_list = []
-    entity = client.get(id_, load=True)
+    try:
+        entity = client.get(id_, load=True)
+    except Exception as e:
+        print(f"Error getting entity {id_}: {e}")
+        return None, [], []  # Return None and empty lists if entity retrieval fails
+
+    if entity is None:
+        return None, [], []  # Return None and empty lists if entity is None
 
     for prop in entity.data['claims']:
         prop_list.append(prop)
@@ -84,6 +91,11 @@ def process_item(args, client, label_map):
         url, name_, label_ = args
         single_id = url.split("/")[-1]
         entity, prop_list, prop_names_list = getEP_cached(single_id, client)
+
+        if entity is None:
+            print(f"Skipping item {single_id} due to entity retrieval error.")
+            return None  # Signal to skip this item
+
         return {
             single_id: {
                 'name': name_,
@@ -112,7 +124,8 @@ def parse_df_properties(dataset, client):
     data_tuples = list(zip(urls_col, name_col, label_col))
 
     with ThreadPoolExecutor(max_workers=16) as executor:
-        list_dict = list(tqdm(executor.map(lambda args: process_item(args, client, label_map), data_tuples), total=len(data_tuples), desc="Parsing dataset properties..."))
+        results = list(tqdm(executor.map(process_item, data_tuples), total=len(data_tuples), desc="Parsing dataset..."))
+        list_dict = [result for result in results if result is not None]  # Exclude None results
 
     my_df = dict2pd(list_dict)
 
