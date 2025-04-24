@@ -16,6 +16,11 @@ def make_graph(G, df, add_label):
   if not set(cols).issubset(set(df.columns)):
     print(f"Missing required columns: {set(cols) - set(df.columns)}")
 
+    for col in cols:
+        if col not in df.columns:
+            print(f"Adding '{col}' with default 0")
+            df[col] = 0
+
 
   for _, row in df.iterrows():
       entity = row["qid"]

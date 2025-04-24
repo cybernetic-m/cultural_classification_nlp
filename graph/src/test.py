@@ -52,7 +52,7 @@ def test(A, y, node_idx, X_test, y_test, kernel, gamma, n_neighbors, print_stati
     int_to_labels = {v: k for k, v in labels_to_int.items()}
 
     final_df = predictions_df[['qid']].copy()
-    final_df['label'] = predictions_df['predicted_label'].map(int_to_labels)
+    final_df['label'] = predictions_df['y_pred'].map(int_to_labels)
 
     # 8. Accuracy
     acc = accuracy_score(y_true, y_pred)
