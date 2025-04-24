@@ -9,6 +9,11 @@ import seaborn as sns
 from sklearn.semi_supervised import LabelPropagation
 import pandas as pd
 
+from graph.src.graph import make_graph, prepare_data
+from graph.src.process_data import process_df
+from graph.src.save_and_load import load_graph
+
+
 def test(A, y, node_idx, X_test, y_test, kernel, gamma, n_neighbors, print_statistics):
     predictions_df = pd.DataFrame({'qid': X_test})
 
@@ -67,4 +72,22 @@ def test(A, y, node_idx, X_test, y_test, kernel, gamma, n_neighbors, print_stati
 
     return final_df, acc
 
-# MIGLIORE NN = 10: 0.73 CON SPLIT_VAL=2000
+
+def eval_non_lm(df):
+  # this function downloads the data of the properties and the languages
+  my_test_df = process_df(df)
+  G = load_graph('cultural_graph')
+  # adds the new elements to the graph already made of the training data, without labels, the labels are set to -1 (to be predicted)
+  make_graph(G, my_test_df, False)
+
+  X_test = my_test_df["qid"].tolist()
+  y_test = my_test_df["label"].tolist()
+
+  A, y, node_idx = prepare_data(G)
+
+  # returns a df with qid and predictions, the last param indicates to not print the confusion matrix
+  predictions_df, acc = test(A, y, node_idx, X_test, y_test, 'knn', 10, 10, False)
+  #print(f'accuracy sul test: {acc}')
+  #predictions_df.head()
+  predictions_df.to_csv('predictions.csv', index=False)
+  return predictions_df
