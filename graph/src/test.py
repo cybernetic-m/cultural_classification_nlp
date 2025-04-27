@@ -9,8 +9,8 @@ import seaborn as sns
 from sklearn.semi_supervised import LabelPropagation
 import pandas as pd
 
-
 import os, sys
+
 # Get the absolute paths of the directories containing the utils functions and train_one_epoch
 src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../src'))
 
@@ -23,6 +23,24 @@ from save_and_load import load_graph
 
 
 def test(A, y, node_idx, X_test, y_test, kernel, gamma, n_neighbors, print_statistics):
+    """
+    Apply Label Propagation algorithm and predict labels for test nodes.
+
+    Inputs:
+    - A: scipy sparse matrix representing the adjacency matrix of the graph
+    - y: array of node labels (with -1 for unlabeled nodes)
+    - node_idx: dictionary mapping node names to their indices
+    - X_test: list of test node names (qids)
+    - y_test: list of true labels for test nodes
+    - kernel: type of kernel to use ('knn' or 'rbf')
+    - gamma: gamma value for 'rbf' kernel
+    - n_neighbors: number of neighbors for 'knn' kernel
+    - print_statistics: boolean to print evaluation metrics (confusion matrix, classification report)
+
+    Output:
+    - final_df: pandas DataFrame with 'qid' and predicted label
+    - acc: float, accuracy score on test nodes
+    """
     predictions_df = pd.DataFrame({'qid': X_test})
 
     labels_to_int = {"cultural exclusive": 0, "cultural representative": 1, "cultural agnostic": 2}
@@ -82,20 +100,32 @@ def test(A, y, node_idx, X_test, y_test, kernel, gamma, n_neighbors, print_stati
 
 
 def eval_non_lm(df):
-  # this function downloads the data of the properties and the languages
-  my_test_df = process_df(df)
-  G = load_graph('cultural_graph')
-  # adds the new elements to the graph already made of the training data, without labels, the labels are set to -1 (to be predicted)
-  make_graph(G, my_test_df, False)
+    """
+    Evaluate non-language-model-based approach:
+    - Parse properties and languages for the input dataframe
+    - Expand the training graph with test nodes (without labels)
+    - Apply Label Propagation to predict labels
 
-  X_test = my_test_df["qid"].tolist()
-  y_test = my_test_df["label"].tolist()
+    Inputs:
+    - df: pandas DataFrame containing at least 'item', 'category', 'subcategory', and 'label'
 
-  A, y, node_idx = prepare_data(G)
+    Output:
+    - predictions_df: pandas DataFrame with 'qid' and predicted label
+    """
+    # this function downloads the data of the properties and the languages
+    my_test_df = process_df(df)
+    G = load_graph('cultural_graph')
+    # adds the new elements to the graph already made of the training data, without labels, the labels are set to -1 (to be predicted)
+    make_graph(G, my_test_df, False)
 
-  # returns a df with qid and predictions, the last param indicates to not print the confusion matrix
-  predictions_df, acc = test(A, y, node_idx, X_test, y_test, 'knn', 10, 10, False)
-  #print(f'accuracy sul test: {acc}')
-  #predictions_df.head()
-  predictions_df.to_csv('predictions.csv', index=False)
-  return predictions_df
+    X_test = my_test_df["qid"].tolist()
+    y_test = my_test_df["label"].tolist()
+
+    A, y, node_idx = prepare_data(G)
+
+    # returns a df with qid and predictions, the last param indicates to not print the confusion matrix
+    predictions_df, acc = test(A, y, node_idx, X_test, y_test, 'knn', 10, 10, False)
+    # print(f'accuracy sul test: {acc}')
+    # predictions_df.head()
+    predictions_df.to_csv('predictions.csv', index=False)
+    return predictions_df

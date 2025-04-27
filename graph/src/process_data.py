@@ -27,7 +27,18 @@ from save_and_load import load_encoder
 wikidata_cache = {}
 wikidata_lock = threading.Lock()  # Per scrittura concorrente sicura
 
+
 def cached_id2string(id_, client):
+    """
+        Retrieve the English label for a given Wikidata ID using a cache.
+
+        Inputs:
+        - id_: Wikidata ID string (e.g., 'Q42')
+        - client: Wikidata API client object
+
+        Output:
+        - label: English label (string) corresponding to the ID
+    """
     with wikidata_lock:
         if id_ in wikidata_cache:
             return wikidata_cache[id_]
@@ -38,7 +49,20 @@ def cached_id2string(id_, client):
         wikidata_cache[id_] = label
     return label
 
+
 def getEP_cached(id_, client):
+    """
+        Retrieve properties of a Wikidata entity, using caching for property labels.
+
+        Inputs:
+        - id_: Wikidata entity ID (string)
+        - client: Wikidata API client object
+
+        Outputs:
+        - entity: full entity object
+        - prop_list: list of property IDs
+        - prop_names_list: list of corresponding property labels (strings)
+    """
     prop_list = []
     prop_names_list = []
     try:
@@ -57,7 +81,18 @@ def getEP_cached(id_, client):
 
     return entity, prop_list, prop_names_list
 
+
 def dict2pd(list_dict):
+    """
+        Convert a list of dictionaries into a pandas DataFrame,
+        with one-hot encoding of property IDs.
+
+        Inputs:
+        - list_dict: list of dictionaries containing entity data
+
+        Output:
+        - df: pandas DataFrame with columns for 'qid', properties (as binary flags), and 'label'
+    """
     pid_set = set()
     rows = []
 
@@ -86,28 +121,53 @@ def dict2pd(list_dict):
 
     return df
 
+
 def process_item(args, client, label_map):
-        time.sleep(random.uniform(0.3, 1.0))  # Sleep fra 300ms e 1s
-        url, name_, label_ = args
-        single_id = url.split("/")[-1]
-        entity, prop_list, prop_names_list = getEP_cached(single_id, client)
+    """
+        Process a single item (URL, name, label) to extract Wikidata properties.
 
-        if entity is None:
-            print(f"Skipping item {single_id} due to entity retrieval error.")
-            return None  # Signal to skip this item
+        Inputs:
+        - args: tuple (url, name, label) for the item
+        - client: Wikidata API client object
+        - label_map: dictionary mapping label strings to integer classes
 
-        return {
-            single_id: {
-                'name': name_,
-                'properties': {
-                    'id': prop_list,
-                    'name': prop_names_list,
-                },
-                'label': label_map.get(label_, -1),
-            }
+        Output:
+        - dictionary with entity data if successful, otherwise None
+    """
+    time.sleep(random.uniform(0.3, 1.0))  # Sleep fra 300ms e 1s
+    url, name_, label_ = args
+    single_id = url.split("/")[-1]
+    entity, prop_list, prop_names_list = getEP_cached(single_id, client)
+
+    if entity is None:
+        print(f"Skipping item {single_id} due to entity retrieval error.")
+        return None  # Signal to skip this item
+
+    return {
+        single_id: {
+            'name': name_,
+            'properties': {
+                'id': prop_list,
+                'name': prop_names_list,
+            },
+            'label': label_map.get(label_, -1), # default is -1
         }
+    }
+
 
 def parse_df_properties(dataset, client):
+    """
+    Parse a dataset to extract Wikidata properties and convert to a pandas DataFrame.
+
+    Inputs:
+    - dataset: pandas DataFrame with columns ['item', 'name', 'label']
+    - client: Wikidata API client object
+
+    Output:
+    - my_df: pandas DataFrame where each row represents an entity,
+             with one-hot encoded properties and class label
+    """
+
     original_df = dataset
     list_dict = []
 
@@ -134,10 +194,25 @@ def parse_df_properties(dataset, client):
 
     return my_df
 
-#-------------------------------------#
+
+# -------------------------------------#
 # Function to get views of wikipedia page
-#-------------------------------------#
+# -------------------------------------#
 def get_pageviews(lang, title, start='20240101', end='20250101', retries=5, delay=1):
+    """
+    Retrieve the total pageviews of a Wikipedia article over a given time period.
+
+    Inputs:
+    - lang: language code for Wikipedia (e.g., 'en', 'it')
+    - title: title of the Wikipedia article (string)
+    - start: start date in 'YYYYMMDD' format (default '20240101')
+    - end: end date in 'YYYYMMDD' format (default '20250101')
+    - retries: number of retry attempts in case of failure (default 5)
+    - delay: delay (in seconds) between retry attempts (default 1)
+
+    Output:
+    - tuple (lang, total_views) where total_views is an integer or np.nan if failed
+    """
     encoded_title = quote(title, safe='')
     url = (
         f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/"
@@ -156,71 +231,94 @@ def get_pageviews(lang, title, start='20240101', end='20250101', retries=5, dela
                 views = sum(item['views'] for item in data['items'])
                 return (lang, views)
             elif r.status_code == 404:
-               return (lang, np.nan)
+                return (lang, np.nan)
             else:
-                print(f"[{lang}, {encoded_title}] Tentativo {attempt+1}: status code {r.status_code} - url: {url}")
+                print(f"[{lang}, {encoded_title}] Tentativo {attempt + 1}: status code {r.status_code} - url: {url}")
         except Exception as e:
-            print(f"[{lang}, {encoded_title}] Tentativo {attempt+1} fallito con errore: {e}")
+            print(f"[{lang}, {encoded_title}] Tentativo {attempt + 1} fallito con errore: {e}")
         time.sleep(delay)
 
     return (lang, np.nan)
 
-#-------------------------------------#
+
+# -------------------------------------#
 # Function to download pageviews for each language
-#-------------------------------------#
+# -------------------------------------#
 def parse_df_languages(df):
-  client = Client()
-  language_pageview_data = {}
-  labels_to_int = {"cultural exclusive": 0, "cultural representative": 1, "cultural agnostic": 2}
-  all_languages = set()
-  for idx, row in tqdm(df.iterrows(), total=len(df), desc = 'Parsing languages...'):
-      qid = row['item'].split('/')[-1]
-      label_from_df = row['label']
+    """
+    Parse a dataset to collect Wikipedia pageviews across multiple languages for each entity.
 
-      try:
-          item = client.get(qid, load=True)
-      except Exception as e:
-          print(f"Errore con {qid}: {e}")
-          continue
+    Inputs:
+    - df: pandas DataFrame with at least the columns ['item', 'label']
 
-      labels = item.data.get("labels", {})
+    Output:
+    - output_df: pandas DataFrame where each row corresponds to a QID,
+                 with columns for pageviews in different languages and class label
+    """
 
-      language_pageview_data[qid] = {'label': labels_to_int[label_from_df]}
+    client = Client()
+    language_pageview_data = {}
+    labels_to_int = {"cultural exclusive": 0, "cultural representative": 1, "cultural agnostic": 2}
+    all_languages = set()
+    for idx, row in tqdm(df.iterrows(), total=len(df), desc='Parsing languages...'):
+        qid = row['item'].split('/')[-1]
+        label_from_df = row['label']
 
-      # Parallelizzazione delle richieste per ciascuna lingua
-      with ThreadPoolExecutor(max_workers=16) as executor:
-          futures = {
-              executor.submit(get_pageviews, lang, label['value']): lang
-              for lang, label in list(labels.items())[:100]
-          }
+        try:
+            item = client.get(qid, load=True)
+        except Exception as e:
+            print(f"Errore con {qid}: {e}")
+            continue
 
-          for future in as_completed(futures):
-              lang = futures[future]
-              try:
-                  lang, views = future.result()
-                  if views > 0:
-                      language_pageview_data[qid][lang] = views
-                      all_languages.add(lang)
-              except Exception as exc:
-                  print(f"Errore durante il recupero di {lang}: {exc}")
+        labels = item.data.get("labels", {})  # Get all available language labels
 
-  # Crea il DataFrame finale
-  output_df = pd.DataFrame.from_dict(language_pageview_data, orient='index')
-  output_df = output_df.fillna(0).astype(int)
-  output_df.index.name = 'qid'
-  output_df = output_df.reset_index() # This is the crucial line
+        # Initialize the pageview dictionary for the current QID with its class label
+        language_pageview_data[qid] = {'label': labels_to_int[label_from_df]}
 
+        with ThreadPoolExecutor(max_workers=16) as executor:
+            futures = {
+                executor.submit(get_pageviews, lang, label['value']): lang
+                for lang, label in list(labels.items())[:100]  # Limit to first 100 languages
+            }
 
-  return output_df
+            for future in as_completed(futures):
+                lang = futures[future]
+                try:
+                    lang, views = future.result()
+                    if views > 0:
+                        language_pageview_data[qid][lang] = views
+                        all_languages.add(lang)
+                except Exception as exc:
+                    print(f"Errore durante il recupero di {lang}: {exc}")
+
+    # Crea il DataFrame finale
+    output_df = pd.DataFrame.from_dict(language_pageview_data, orient='index')
+    output_df = output_df.fillna(0).astype(int)  # Fill missing values with 0
+    output_df.index.name = 'qid'
+    output_df = output_df.reset_index()
+
+    return output_df
 
 
 def encode_cols_and_merge(df, output_df, category_encoder, subcategory_encoder):
-    # 1. Crea una copia del DataFrame originale con le categorie da codificare
+    """
+    Encode 'category' and 'subcategory' columns using pre-trained encoders and merge with output dataframe.
+
+    Inputs:
+    - df: pandas DataFrame containing original dataset (must have 'item', 'category', 'subcategory' columns)
+    - output_df: pandas DataFrame to merge with (must have 'qid')
+    - category_encoder: pre-fitted sklearn encoder for 'category'
+    - subcategory_encoder: pre-fitted sklearn encoder for 'subcategory'
+
+    Output:
+    - merged_df: pandas DataFrame with encoded category columns merged
+    """
+
     df_encoded = df.copy()
-    # Estrai solo l'ID finale da 'item'
+    # get ID from 'item'
     df_encoded['item'] = df_encoded['item'].astype(str).apply(lambda x: x.split('/')[-1])
 
-    # but use the pre-fitted encoders:
+    # but use the pre-fitted encoders with -1 if class is unknown:
     df_encoded['category_encoded'] = df_encoded['category'].astype(str).apply(
         lambda x: category_encoder.transform([x])[0] if x in category_encoder.classes_ else -1
     )
@@ -228,7 +326,7 @@ def encode_cols_and_merge(df, output_df, category_encoder, subcategory_encoder):
     df_encoded['subcategory_encoded'] = df_encoded['subcategory'].astype(str).apply(
         lambda x: subcategory_encoder.transform([x])[0] if x in subcategory_encoder.classes_ else -1
     )
-    # Assicura che anche qid sia stringa
+
     output_df['qid'] = output_df['qid'].astype(str)
 
     # Merge con encoding
@@ -243,29 +341,52 @@ def encode_cols_and_merge(df, output_df, category_encoder, subcategory_encoder):
 
     return merged_df
 
-def merge_p_language(output_df, my_df2):
-  p_cols = [col for col in my_df2.columns if col.startswith('P')]
-  my_df2_p = my_df2[['qid'] + p_cols]
 
-  return pd.merge(output_df, my_df2_p, on='qid', how='left')
+def merge_p_language(lang_df, p_df):
+    """
+    Merge property columns (starting with 'P') from one dataframe into language df.
+
+    Inputs:
+    - lang_df: language pandas DataFrame (must have 'qid')
+    - p_df: pandas DataFrame containing 'qid' and property columns
+
+    Output:
+    - merged DataFrame with property columns added
+    """
+    p_cols = [col for col in p_df.columns if col.startswith('P')]
+    my_df_p = p_df[['qid'] + p_cols]
+
+    return pd.merge(lang_df, my_df_p, on='qid', how='left')
 
 
 def process_df(df):
-  
-  print('Parsing properties')
-  my_df_P = parse_df_properties(df, Client()) # get properties
-  print('Parsing languages')
-  my_df_lang = parse_df_languages(df) # get languages
+    """
+    Complete processing pipeline:
+    - Parse Wikidata properties
+    - Parse Wikipedia languages and pageviews
+    - Encode category and subcategory
+    - Merge all features into a final dataset
 
-  my_df_lang['total_views'] = my_df_lang.drop(columns=['label', 'qid']).sum(axis=1)
+    Input:
+    - df: pandas DataFrame with at least 'item', 'category', 'subcategory', 'label'
 
-  category_encoder = load_encoder('category_encoder')
-  subcategory_encoder = load_encoder('subcategory_encoder')
+    Output:
+    - final_df: pandas DataFrame fully processed and ready for modeling
+    """
 
+    print('Parsing properties')
+    my_df_P = parse_df_properties(df, Client())  # get properties
+    print('Parsing languages')
+    my_df_lang = parse_df_languages(df)  # get languages
 
-  merged_df = encode_cols_and_merge(df, my_df_lang, category_encoder, subcategory_encoder)
-  merged_df = merged_df.drop(columns=['item'])
+    my_df_lang['total_views'] = my_df_lang.drop(columns=['label', 'qid']).sum(axis=1)
 
-  final_df = merge_p_language(merged_df, my_df_P)
+    category_encoder = load_encoder('category_encoder')
+    subcategory_encoder = load_encoder('subcategory_encoder')
 
-  return final_df
+    merged_df = encode_cols_and_merge(df, my_df_lang, category_encoder, subcategory_encoder)
+    merged_df = merged_df.drop(columns=['item'])
+
+    final_df = merge_p_language(merged_df, my_df_P)
+
+    return final_df
