@@ -116,7 +116,7 @@ def eval_non_lm(dataset_csv):
      # this function downloads the data of the properties and the languages
     if not os.path.exists(dataset_csv):
         print("No dataset provided.\nPlease load it in a csv format into the 'Files' section of colab.\nAfter this, run another time the cells of 'Load of the dataset'.")
-        return
+        return 0, 0
 
     # Transform csv of the dataset into a pandas dataframe
     df = pd.read_csv(dataset_csv)
