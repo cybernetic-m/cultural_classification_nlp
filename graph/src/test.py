@@ -70,6 +70,7 @@ def test(A, y, node_idx, X_test, y_test, kernel, gamma, n_neighbors, print_stati
     int_to_labels = {v: k for k, v in labels_to_int.items()}
 
     final_df = predictions_df.copy()
+    list_of_labels = predictions_df['y_pred'].map(int_to_labels)
     final_df['predicted_label'] = predictions_df['y_pred'].map(int_to_labels)
 
     # 8. Accuracy
@@ -96,7 +97,7 @@ def test(A, y, node_idx, X_test, y_test, kernel, gamma, n_neighbors, print_stati
         print("\nClassification Report:")
         print(classification_report(y_true, y_pred, digits=4))
 
-    return final_df, acc
+    return final_df, acc, list_of_labels
 
 
 def eval_non_lm(dataset_csv):
@@ -132,10 +133,11 @@ def eval_non_lm(dataset_csv):
     A, y, node_idx = prepare_data(G)
 
     # returns a df with qid and predictions, the last param indicates to not print the confusion matrix
-    predictions_df, acc = test(A, y, node_idx, X_test, y_test, 'knn', 10, 10, False)
-
-    predictions_df = predictions_df.merge(df, on='qid', how='left')
+    predictions_df, acc, column_to_add = test(A, y, node_idx, X_test, y_test, 'knn', 10, 10, False)
+    # Add the column with the labels to the predictions dataframe
+    df['predicted_label'] = column_to_add
+    #predictions_df = predictions_df.merge(df, on='qid', how='left')
     # print(f'accuracy sul test: {acc}')
     # predictions_df.head()
-    predictions_df.to_csv('nonLM_predictions.csv', index=False)
+    df.to_csv('nonLM_predictions.csv', index=False)
     return predictions_df, my_test_df
