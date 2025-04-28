@@ -70,7 +70,7 @@ def test(A, y, node_idx, X_test, y_test, kernel, gamma, n_neighbors, print_stati
     int_to_labels = {v: k for k, v in labels_to_int.items()}
 
     final_df = predictions_df.copy()
-    final_df['label'] = predictions_df['y_pred'].map(int_to_labels)
+    final_df['predicted_label'] = predictions_df['y_pred'].map(int_to_labels)
 
     # 8. Accuracy
     acc = accuracy_score(y_true, y_pred)
@@ -133,6 +133,8 @@ def eval_non_lm(dataset_csv):
 
     # returns a df with qid and predictions, the last param indicates to not print the confusion matrix
     predictions_df, acc = test(A, y, node_idx, X_test, y_test, 'knn', 10, 10, False)
+
+    predictions_df = predictions_df.merge(df, on='qid', how='left')
     # print(f'accuracy sul test: {acc}')
     # predictions_df.head()
     predictions_df.to_csv('predictions.csv', index=False)
