@@ -81,7 +81,6 @@ class LMClassifier(nn.Module):
       if self.pooling == 'cls':
         # We take only the first ([CLS]) token that give the embedding of all the sentence
         logits = self.classifier(last_hidden_state[:,0,:])
-        print(last_hidden_state.shape)
       elif self.pooling == 'mean':
         mask = attention_mask.unsqueeze(-1) # originally (batch_size, seq_len) -> (batch_size, seq_len, 1) for multiplication with last_hidden_state
         masked_hidden_state = mask*last_hidden_state # we take only the vectors of the tokens that are not padding vectors
@@ -106,3 +105,4 @@ class LMClassifier(nn.Module):
   def summary(self):
     print("Encoder type:\n\n", self.encoder)
     print("\nClassifier:\n\n", self.classifier)
+    print("\nPooling type:\n\n", self.pooling)
