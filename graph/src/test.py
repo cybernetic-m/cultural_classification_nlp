@@ -137,5 +137,5 @@ def eval_non_lm(dataset_csv):
     predictions_df = predictions_df.merge(df, on='qid', how='left')
     # print(f'accuracy sul test: {acc}')
     # predictions_df.head()
-    predictions_df.to_csv('predictions.csv', index=False)
+    predictions_df.to_csv('nonLM_predictions.csv', index=False)
     return predictions_df, my_test_df

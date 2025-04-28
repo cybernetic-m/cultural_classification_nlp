@@ -168,7 +168,7 @@ def eval_lm(model, model_path, dataset_csv, tokenizer, batch_size, max_length, t
   df_wikipedia['predicted_label'] = [val_to_lab[i] for i in y_pred_list]
   
   # Save in csv format the dataframe with the predictions
-  df_wikipedia.to_csv("./predictions.csv", index=False)
+  df_wikipedia.to_csv("./LM_predictions.csv", index=False)
 
   # Compute also the total training time and the average per epoch 
   time_dict['total_training_time'] = sum(inference_time_list) 
