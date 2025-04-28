@@ -99,7 +99,7 @@ def test(A, y, node_idx, X_test, y_test, kernel, gamma, n_neighbors, print_stati
     return final_df, acc
 
 
-def eval_non_lm(df):
+def eval_non_lm(dataset_csv):
     """
     Evaluate non-language-model-based approach:
     - Parse properties and languages for the input dataframe
@@ -112,7 +112,15 @@ def eval_non_lm(df):
     Output:
     - predictions_df: pandas DataFrame with 'qid' and predicted label
     """
-    # this function downloads the data of the properties and the languages
+    
+     # this function downloads the data of the properties and the languages
+    if not os.path.exists(dataset_csv):
+        print("No dataset provided.\nPlease load it in a csv format into the 'Files' section of colab.\nAfter this, run another time the cells of 'Load of the dataset'.")
+        return
+
+    # Transform csv of the dataset into a pandas dataframe
+    df = pd.read_csv(dataset_csv)
+
     my_test_df = process_df(df)
     G = load_graph('cultural_graph')
     # adds the new elements to the graph already made of the training data, without labels, the labels are set to -1 (to be predicted)
