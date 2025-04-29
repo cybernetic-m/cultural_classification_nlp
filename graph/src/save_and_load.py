@@ -11,9 +11,10 @@ def save_encoder(encoder, path):
       pickle.dump(encoder, f)
 
 def load_encoder(path):
-    #script_dir = os.path.dirname(os.path.abspath(__file__))  # cartella dove si trova il file .py
-    #model_path = os.path.join(script_dir, '..', 'models', name)
-    #model_path = os.path.normpath(model_path)  # normalizza il percorso
+    if path == None:
+        script_dir = os.path.dirname(os.path.abspath(__file__))  # cartella dove si trova il file .py
+        model_path = os.path.join(script_dir, '..', 'models', name)
+        path = os.path.normpath(model_path)  # normalizza il percorso
 
     print("Carico da:", path)  # utile per debug
     with open(path, 'rb') as f:

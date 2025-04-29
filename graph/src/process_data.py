@@ -371,7 +371,7 @@ def merge_p_language(lang_df, p_df):
     return pd.merge(lang_df, my_df_p, on='qid', how='left')
 
 
-def process_df(df, path = './models', labels_flag = False):
+def process_df(df, path = None, labels_flag = False):
     """
     Complete processing pipeline:
     - Parse Wikidata properties
