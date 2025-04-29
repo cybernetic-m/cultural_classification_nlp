@@ -5,18 +5,18 @@ import os
 #-------------------------------------#
 # Functions to save and load the Label Encoder
 #-------------------------------------#
-def save_encoder(encoder, name):
+def save_encoder(encoder, path):
   # Save category_encoder
-  with open(f'../models/{name}.pkl', 'wb') as f:
+  with open(path, 'wb') as f:
       pickle.dump(encoder, f)
 
-def load_encoder(name):
-    script_dir = os.path.dirname(os.path.abspath(__file__))  # cartella dove si trova il file .py
-    model_path = os.path.join(script_dir, '..', 'models', name)
-    model_path = os.path.normpath(model_path)  # normalizza il percorso
+def load_encoder(path):
+    #script_dir = os.path.dirname(os.path.abspath(__file__))  # cartella dove si trova il file .py
+    #model_path = os.path.join(script_dir, '..', 'models', name)
+    #model_path = os.path.normpath(model_path)  # normalizza il percorso
 
-    print("Carico da:", model_path)  # utile per debug
-    with open(f'{model_path}.pkl', 'rb') as f:
+    print("Carico da:", path)  # utile per debug
+    with open(f'{path}.pkl', 'rb') as f:
           return pickle.load(f)
   
 #-------------------------------------#
