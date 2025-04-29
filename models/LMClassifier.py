@@ -87,7 +87,7 @@ class LMClassifier(nn.Module):
         masked_hidden_state = mask*last_hidden_state # we take only the vectors of the tokens that are not padding vectors
         sum_hidden_state = torch.sum(masked_hidden_state, dim=1) # Sum all the vectors of the tokens that are not padding
         num_tokens = torch.sum(mask, dim=1) # Count the number of tokens that are not padding
-        mean_hidden_state = sum_hidden_state / num_tokens # Take the mean of all the tokens embedding
+        mean_hidden_state = sum_hidden_state / (num_tokens + 1e-8) # Take the mean of all the tokens embedding
         logits = self.classifier(mean_hidden_state)
       elif self.pooling == 'max':
         mask = attention_mask.unsqueeze(-1) # originally (batch_size, seq_len) -> (batch_size, seq_len, 1) for multiplication with last_hidden_state
