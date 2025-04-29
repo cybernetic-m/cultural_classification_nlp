@@ -104,7 +104,7 @@ def test(A, y, node_idx, X_test, y_test, kernel, gamma, n_neighbors, print_stati
     return final_df, list_of_labels
 
 
-def eval_non_lm(dataset_csv):
+def eval_non_lm(dataset_csv, path = './models'):
     """
     Evaluate non-language-model-based approach:
     - Parse properties and languages for the input dataframe
@@ -131,7 +131,7 @@ def eval_non_lm(dataset_csv):
     if 'label' in df.columns:
         labels_flag = True
 
-    my_test_df = process_df(df, labels_flag)
+    my_test_df = process_df(df = df, path = path, labels_flag = labels_flag)
     G = load_graph('cultural_graph')
     # adds the new elements to the graph already made of the training data, without labels, the labels are set to -1 (to be predicted)
     make_graph(G, my_test_df, False)
