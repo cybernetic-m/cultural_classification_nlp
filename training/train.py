@@ -80,7 +80,7 @@ def train(num_epochs, model, train_dataloader, val_dataloader, train_metrics_dic
   dict_save_and_load(train_dict_list, training_dir + '/train_metrics_dict.json', todo='save')
   dict_save_and_load(val_dict_list, training_dir + '/val_metrics_dict.json', todo='save')
   dict_save_and_load(config_dict, training_dir + '/hyperparams.json', todo='save')
-  dict_save_and_load(time_dict, training_dir + '/time.json', todo='save')
+  dict_save_and_load(time_dict, training_dir + '/training_time.json', todo='save')
 
 
 
