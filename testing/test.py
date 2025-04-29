@@ -181,7 +181,7 @@ def eval_lm(model, model_path, dataset_csv, tokenizer, batch_size, max_length, t
   df_wikipedia = df_wikipedia.drop(columns=['en_wikipedia_views', 'en_wikipedia_summary'])
 
   # Add another column in the dataframe with all the predictions in strings
-  df_wikipedia['predicted_label'] = [val_to_lab[i] for i in y_pred_list]
+  df_wikipedia['label'] = [val_to_lab[i] for i in y_pred_list]
   
   # Save in csv format the dataframe with the predictions
   df_wikipedia.to_csv("./LM_predictions.csv", index=False)
