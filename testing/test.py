@@ -69,8 +69,8 @@ def test(model, model_path, test_dataloader, test_metrics_dict, loss_fn, device)
   test_loss = test_loss_batch / len(test_dataloader) # average for all the batches
 
   # Compute also the total training time and the average per epoch 
-  time_dict['total_training_time'] = sum(inference_time_list) 
-  time_dict ['avg_epoch_training_time'] = sum(inference_time_list) / len(inference_time_list)
+  time_dict['total_inference_time'] = sum(inference_time_list) 
+  time_dict ['avg_inference_time'] = sum(inference_time_list) / len(inference_time_list)
 
   test_metrics_dict, confusion_matrix = calculate_metrics(y_true_list, y_pred_list, test_metrics_dict) 
   test_metrics_dict['loss'] = test_loss
@@ -79,7 +79,7 @@ def test(model, model_path, test_dataloader, test_metrics_dict, loss_fn, device)
   # the config file with all the hyperparams of the model
   # the time data (total time and average time)
   dict_save_and_load(test_metrics_dict, test_dir + '/test_metrics_dict.json', todo='save')
-  dict_save_and_load(time_dict, test_dir + '/time.json', todo='save')
+  dict_save_and_load(time_dict, test_dir + '/inference_time.json', todo='save')
 
   # Transform the confusion matrix to a pandas dataframe
   labels = ['C.A.', 'C.R.', 'C.E.']
@@ -187,8 +187,8 @@ def eval_lm(model, model_path, dataset_csv, tokenizer, batch_size, max_length, t
   df_wikipedia.to_csv("./LM_predictions.csv", index=False)
 
   # Compute also the total training time and the average per epoch 
-  time_dict['total_training_time'] = sum(inference_time_list) 
-  time_dict ['avg_epoch_training_time'] = sum(inference_time_list) / len(inference_time_list)
+  time_dict['total_inference_time'] = sum(inference_time_list) 
+  time_dict ['avg_inference_time'] = sum(inference_time_list) / len(inference_time_list)
 
   # Compute the metrics only if the dataset has labels
   if labels_flag == True:
@@ -200,7 +200,7 @@ def eval_lm(model, model_path, dataset_csv, tokenizer, batch_size, max_length, t
   # the time data (total time and average time)
   if labels_flag == True:
     dict_save_and_load(test_metrics_dict, './test_metrics_dict.json', todo='save')
-  dict_save_and_load(time_dict, './time.json', todo='save')
+  dict_save_and_load(time_dict, './inference_time.json', todo='save')
 
   # Transform the confusion matrix to a pandas dataframe
   if labels_flag == True:
