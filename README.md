@@ -6,11 +6,11 @@ The task of this homework consists in developing a non LM-based and an LM-based 
 # Graph-based Method
 
 
-<img src="./images/image_2.png" alt="Description" width="400" height = "400" />
+<img src="./images/image_2.png" alt="Description" width="500" height = "400" />
 
 # LM-based Method
 In the LM-based method we have used a Transformer Encoder (like BERT) to extract features from text, a Pooling layer to aggregate all the hidden tensors and a Classifier layer (like a Linear or MLP layer) at the end for the final classification.
 
-<img src="./images/image_3.png" alt="Description" width="400" height = "400" />
+<img src="./images/image_3.png" alt="Description" width="500" height = "500" />
 
 # Results
