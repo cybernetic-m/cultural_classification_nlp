@@ -22,7 +22,7 @@ from process_data import process_df
 from save_and_load import load_graph
 
 
-def test(A, y, node_idx, X_test, y_test, kernel, gamma, n_neighbors, print_statistics):
+def test(A, y, node_idx, X_test, y_test, kernel, gamma, n_neighbors, print_statistics, labels_flag):
     """
     Apply Label Propagation algorithm and predict labels for test nodes.
 
@@ -55,15 +55,17 @@ def test(A, y, node_idx, X_test, y_test, kernel, gamma, n_neighbors, print_stati
 
     # 7. Predici per i nodi di test
     y_pred = []
-    y_true = []
+    if labels_flag:
+        y_true = []
     for node in X_test:
         i = node_idx[node]  # index for current test node
         pred = lp_model.transduction_[i]  # get prediction from index
         y_pred.append(pred)
         # Get the true label from y_test instead of the graph
         # This fixes the issue of having None in y_true
-        true_label = y_test[X_test.index(node)]
-        y_true.append(true_label)
+        if labels_flag:
+            true_label = y_test[X_test.index(node)]
+            y_true.append(true_label)
 
     predictions_df['y_pred'] = y_pred
 
@@ -74,30 +76,32 @@ def test(A, y, node_idx, X_test, y_test, kernel, gamma, n_neighbors, print_stati
     final_df['predicted_label'] = predictions_df['y_pred'].map(int_to_labels)
 
     # 8. Accuracy
-    acc = accuracy_score(y_true, y_pred)
+    if labels_flag:
+        acc = accuracy_score(y_true, y_pred)
 
     if print_statistics:
-        print(f"Accuracy su nodi di test: {acc:.4f}")
+        if labels_flag:
+            print(f"Accuracy su nodi di test: {acc:.4f}")
 
-        # 9. Confusion Matrix
-        cm = confusion_matrix(y_true, y_pred)
-        # print("\nConfusion Matrix:")
-        # print(cm)
+            # 9. Confusion Matrix
+            cm = confusion_matrix(y_true, y_pred)
+            # print("\nConfusion Matrix:")
+            # print(cm)
 
-        # Visualizza confusion matrix con seaborn
-        plt.figure(figsize=(6, 4))
-        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
-        plt.xlabel('Predicted Label')
-        plt.ylabel('True Label')
-        plt.title('Confusion Matrix - Label Propagation')
-        plt.tight_layout()
-        plt.show()
+            # Visualizza confusion matrix con seaborn
+            plt.figure(figsize=(6, 4))
+            sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
+            plt.xlabel('Predicted Label')
+            plt.ylabel('True Label')
+            plt.title('Confusion Matrix - Label Propagation')
+            plt.tight_layout()
+            plt.show()
 
-        # 10. Classification Report
-        print("\nClassification Report:")
-        print(classification_report(y_true, y_pred, digits=4))
+            # 10. Classification Report
+            print("\nClassification Report:")
+            print(classification_report(y_true, y_pred, digits=4))
 
-    return final_df, acc, list_of_labels
+    return final_df, list_of_labels
 
 
 def eval_non_lm(dataset_csv):
@@ -133,12 +137,17 @@ def eval_non_lm(dataset_csv):
     make_graph(G, my_test_df, False)
 
     X_test = my_test_df["qid"].tolist()
-    y_test = my_test_df["label"].tolist()
+    if labels_flag:
+        # if the test set has labels, we take them from the dataframe
+        y_test = my_test_df["label"].tolist()
+    else:
+        # if the test set has no labels, we create a list of -1
+        y_test = [-1] * len(X_test)
 
     A, y, node_idx = prepare_data(G)
 
     # returns a df with qid and predictions, the last param indicates to not print the confusion matrix
-    predictions_df, acc, column_to_add = test(A, y, node_idx, X_test, y_test, 'knn', 10, 10, False)
+    predictions_df, column_to_add = test(A, y, node_idx, X_test, y_test, 'knn', 10, 10, False)
     # Add the column with the labels to the predictions dataframe
     df['predicted_label'] = column_to_add
     #predictions_df = predictions_df.merge(df, on='qid', how='left')
