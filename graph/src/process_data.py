@@ -155,7 +155,7 @@ def process_item(args, client, label_map):
     }
 
 
-def parse_df_properties(dataset, client):
+def parse_df_properties(dataset, client, labels_flag = False):
     """
     Parse a dataset to extract Wikidata properties and convert to a pandas DataFrame.
 
@@ -174,11 +174,17 @@ def parse_df_properties(dataset, client):
     label_map = {
         "cultural agnostic": 2,
         "cultural representative": 1,
-        "cultural exclusive": 0
+        "cultural exclusive": 0,
+        "": -1
     }
 
     urls_col = original_df['item']
-    label_col = original_df['label']
+
+    if labels_flag:
+        label_col = original_df['label']
+    else:
+        label_col = [-1 for _ in range(len(original_df))] # if no labels
+
     name_col = original_df['name']
 
     data_tuples = list(zip(urls_col, name_col, label_col))
@@ -242,9 +248,9 @@ def get_pageviews(lang, title, start='20240101', end='20250101', retries=5, dela
 
 
 # -------------------------------------#
-# Function to download pageviews for each language
+# Function to download pageviewels for each language
 # -------------------------------------#
-def parse_df_languages(df):
+def parse_df_languages(df, labels_flag = False):
     """
     Parse a dataset to collect Wikipedia pageviews across multiple languages for each entity.
 
@@ -262,7 +268,11 @@ def parse_df_languages(df):
     all_languages = set()
     for idx, row in tqdm(df.iterrows(), total=len(df), desc='Parsing languages...'):
         qid = row['item'].split('/')[-1]
-        label_from_df = row['label']
+
+        if labels_flag:
+            label_from_df = row['label']
+            # Initialize the pageview dictionary for the current QID with its class label
+            language_pageview_data[qid] = {'label': labels_to_int[label_from_df]}
 
         try:
             item = client.get(qid, load=True)
@@ -272,8 +282,7 @@ def parse_df_languages(df):
 
         labels = item.data.get("labels", {})  # Get all available language labels
 
-        # Initialize the pageview dictionary for the current QID with its class label
-        language_pageview_data[qid] = {'label': labels_to_int[label_from_df]}
+
 
         with ThreadPoolExecutor(max_workers=16) as executor:
             futures = {
@@ -359,7 +368,7 @@ def merge_p_language(lang_df, p_df):
     return pd.merge(lang_df, my_df_p, on='qid', how='left')
 
 
-def process_df(df):
+def process_df(df, labels_flag = False):
     """
     Complete processing pipeline:
     - Parse Wikidata properties
@@ -379,7 +388,11 @@ def process_df(df):
     print('Parsing languages')
     my_df_lang = parse_df_languages(df)  # get languages
 
-    my_df_lang['total_views'] = my_df_lang.drop(columns=['label', 'qid']).sum(axis=1)
+    if labels_flag:
+        my_df_lang['total_views'] = my_df_lang.drop(columns=['label', 'qid']).sum(axis=1)
+    else:
+        my_df_lang['total_views'] = my_df_lang.drop(columns=['qid']).sum(axis=1)
+
 
     category_encoder = load_encoder('category_encoder')
     subcategory_encoder = load_encoder('subcategory_encoder')

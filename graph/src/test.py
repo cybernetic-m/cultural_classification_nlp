@@ -122,7 +122,12 @@ def eval_non_lm(dataset_csv):
     # Transform csv of the dataset into a pandas dataframe
     df = pd.read_csv(dataset_csv)
 
-    my_test_df = process_df(df)
+    labels_flag = False
+    # check if the test_dataset has labels......... no comment
+    if 'label' in df.columns:
+        labels_flag = True
+
+    my_test_df = process_df(df, labels_flag)
     G = load_graph('cultural_graph')
     # adds the new elements to the graph already made of the training data, without labels, the labels are set to -1 (to be predicted)
     make_graph(G, my_test_df, False)
