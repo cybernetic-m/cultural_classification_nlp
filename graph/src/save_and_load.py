@@ -16,7 +16,7 @@ def load_encoder(path):
     #model_path = os.path.normpath(model_path)  # normalizza il percorso
 
     print("Carico da:", path)  # utile per debug
-    with open(f'{path}.pkl', 'rb') as f:
+    with open(path, 'rb') as f:
           return pickle.load(f)
   
 #-------------------------------------#
