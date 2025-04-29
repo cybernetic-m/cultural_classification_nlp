@@ -75,12 +75,10 @@ def test(A, y, node_idx, X_test, y_test, kernel, gamma, n_neighbors, print_stati
     list_of_labels = predictions_df['y_pred'].map(int_to_labels)
     final_df['predicted_label'] = predictions_df['y_pred'].map(int_to_labels)
 
-    # 8. Accuracy
-    if labels_flag:
-        acc = accuracy_score(y_true, y_pred)
 
     if print_statistics:
         if labels_flag:
+            acc = accuracy_score(y_true, y_pred)
             print(f"Accuracy su nodi di test: {acc:.4f}")
 
             # 9. Confusion Matrix
@@ -104,7 +102,7 @@ def test(A, y, node_idx, X_test, y_test, kernel, gamma, n_neighbors, print_stati
     return final_df, list_of_labels
 
 
-def eval_non_lm(dataset_csv, path = './models'):
+def eval_non_lm(dataset_csv, path = './models', print_statistics = False):
     """
     Evaluate non-language-model-based approach:
     - Parse properties and languages for the input dataframe
@@ -147,7 +145,7 @@ def eval_non_lm(dataset_csv, path = './models'):
     A, y, node_idx = prepare_data(G)
 
     # returns a df with qid and predictions, the last param indicates to not print the confusion matrix
-    predictions_df, column_to_add = test(A, y, node_idx, X_test, y_test, 'knn', 10, 10, False, labels_flag=labels_flag)
+    predictions_df, column_to_add = test(A, y, node_idx, X_test, y_test, 'knn', 10, 10, print_statistics, labels_flag=labels_flag)
     # Add the column with the labels to the predictions dataframe
     df['label'] = column_to_add
     #predictions_df = predictions_df.merge(df, on='qid', how='left')
