@@ -273,6 +273,9 @@ def parse_df_languages(df, labels_flag = False):
             label_from_df = row['label']
             # Initialize the pageview dictionary for the current QID with its class label
             language_pageview_data[qid] = {'label': labels_to_int[label_from_df]}
+        else:
+            # Initialize the pageview dictionary for the current QID without a class label
+            language_pageview_data[qid] = {}
 
         try:
             item = client.get(qid, load=True)
@@ -386,7 +389,7 @@ def process_df(df, labels_flag = False):
     print('Parsing properties')
     my_df_P = parse_df_properties(df, Client())  # get properties
     print('Parsing languages')
-    my_df_lang = parse_df_languages(df)  # get languages
+    my_df_lang = parse_df_languages(df, labels_flag)  # get languages
 
     if labels_flag:
         my_df_lang['total_views'] = my_df_lang.drop(columns=['label', 'qid']).sum(axis=1)
