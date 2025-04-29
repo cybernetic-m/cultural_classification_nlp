@@ -371,7 +371,7 @@ def merge_p_language(lang_df, p_df):
     return pd.merge(lang_df, my_df_p, on='qid', how='left')
 
 
-def process_df(df, labels_flag = False):
+def process_df(df, path = './models', labels_flag = False):
     """
     Complete processing pipeline:
     - Parse Wikidata properties
@@ -397,8 +397,8 @@ def process_df(df, labels_flag = False):
         my_df_lang['total_views'] = my_df_lang.drop(columns=['qid']).sum(axis=1)
 
 
-    category_encoder = load_encoder('category_encoder')
-    subcategory_encoder = load_encoder('subcategory_encoder')
+    category_encoder = load_encoder(path + '/category_encoder.pkl')
+    subcategory_encoder = load_encoder(path + '/subcategory_encoder.pkl')
 
     merged_df = encode_cols_and_merge(df, my_df_lang, category_encoder, subcategory_encoder)
     merged_df = merged_df.drop(columns=['item'])
