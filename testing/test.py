@@ -119,20 +119,30 @@ def eval_lm(model, model_path, dataset_csv, tokenizer, batch_size, max_length, t
   
   # Transform csv of the dataset into a pandas dataframe
   df = pd.read_csv(dataset_csv)
+  labels_flag = False
+  # check if the test_dataset has labels......... no comment
+  if 'label' in df.columns:
+    labels_flag = True
   
   # Add Wikipedia data
   df_wikipedia = add_wikipedia_data(df, lang='en', max_workers=5)
 
   # Create the dataloader for the test set
-  test_dataset = CulturalDataset(df_wikipedia, tokenizer = tokenizer, max_length = max_length, text_type='NDVS')
+  test_dataset = CulturalDataset(df_wikipedia, tokenizer = tokenizer, max_length = max_length, text_type='NDVS', labels_flag=labels_flag)
   test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
   # Initialization of loss and lists for y_pred, y_true and the inference time
-  test_loss_batch = 0
-  y_true_list = []
+  
+  # Create all these variables only if the dataset has labels
+  if labels_flag == True:
+    test_loss_batch = 0
+    y_true_list = []
+
+  # Everytime instead create a list of predictions and time variables
   y_pred_list = []
   inference_time_list = []
   time_dict = {}
+
 
   # Loop for evaluate the model
   for _, data in enumerate(tqdm(test_dataloader, desc="Testing", leave=False)):
@@ -141,25 +151,31 @@ def eval_lm(model, model_path, dataset_csv, tokenizer, batch_size, max_length, t
     input_ids_i = data['input_ids'].to(device) 
     attention_mask_i = data['attention_mask'].to(device)
     
-    # Store the y_true and compute y_pred 
-    y_true = data['label'].to(device)
+    # Store the y_true only if the dataset has labels 
+    if labels_flag == True:
+      y_true = data['label'].to(device)
+
     start_time = time.time()
 
     with torch.no_grad():
+      # Compute the predictions
       y_pred = model(input_ids_i, attention_mask_i)
       end_time = time.time()
       inference_time_list.append(end_time - start_time)
 
-      # Update the lists
-      y_true_list += y_true.tolist()
+      # Update the lists 
+      if labels_flag == True:
+        y_true_list += y_true.tolist()
       y_pred_list += torch.argmax(y_pred,dim=1).tolist()
 
-      # Compute the loss giving both tensors with predictions and true values for this batch
+      # Compute the loss (only if the test dataset has labels) giving both tensors with predictions and true values for this batch
       # it is a pytorch tensor tensor(1.2345, grad_fn=<NllLossBackward0>)
-      loss = loss_fn(y_pred, y_true)
-      test_loss_batch += loss.item()
+      if labels_flag == True:
+        loss = loss_fn(y_pred, y_true)
+        test_loss_batch += loss.item()
 
-  test_loss = test_loss_batch / len(test_dataloader) # average for all the batches
+  if labels_flag == True:
+    test_loss = test_loss_batch / len(test_dataloader) # average for all the batches
 
   # Eliminate columns of wikipedia
   df_wikipedia = df_wikipedia.drop(columns=['en_wikipedia_views', 'en_wikipedia_summary'])
@@ -174,31 +190,34 @@ def eval_lm(model, model_path, dataset_csv, tokenizer, batch_size, max_length, t
   time_dict['total_training_time'] = sum(inference_time_list) 
   time_dict ['avg_epoch_training_time'] = sum(inference_time_list) / len(inference_time_list)
 
-  test_metrics_dict, confusion_matrix = calculate_metrics(y_true_list, y_pred_list, test_metrics_dict) 
-  test_metrics_dict['loss'] = test_loss
+  # Compute the metrics only if the dataset has labels
+  if labels_flag == True:
+    test_metrics_dict, confusion_matrix = calculate_metrics(y_true_list, y_pred_list, test_metrics_dict) 
+    test_metrics_dict['loss'] = test_loss
 
   # Save training, validation dictionaries of the whole training 
   # the config file with all the hyperparams of the model
   # the time data (total time and average time)
-  dict_save_and_load(test_metrics_dict, './test_metrics_dict.json', todo='save')
+  if labels_flag == True:
+    dict_save_and_load(test_metrics_dict, './test_metrics_dict.json', todo='save')
   dict_save_and_load(time_dict, './time.json', todo='save')
 
   # Transform the confusion matrix to a pandas dataframe
-  labels = ['C.A.', 'C.R.', 'C.E.']
-  cm_df = pd.DataFrame(confusion_matrix, index=labels, columns=labels)
+  if labels_flag == True:
+    labels = ['C.A.', 'C.R.', 'C.E.']
+    cm_df = pd.DataFrame(confusion_matrix, index=labels, columns=labels)
+    # Save the confusion matrix in a csv file
+    cm_df.to_csv("./confusion_matrix.csv")
 
-  # Save the confusion matrix in a csv file
-  cm_df.to_csv("./confusion_matrix.csv")
+    print("Test Metrics:")
+    print(f"test loss: {test_metrics_dict['loss']}")
+    print(f"accuracy: {test_metrics_dict['accuracy']}  precision: {test_metrics_dict['precision']}  recall: {test_metrics_dict['recall']}  f1_score: {test_metrics_dict['f1']}")
+    print("Confusion Matrix:")
 
-  print("Test Metrics:")
-  print(f"test loss: {test_metrics_dict['loss']}")
-  print(f"accuracy: {test_metrics_dict['accuracy']}  precision: {test_metrics_dict['precision']}  recall: {test_metrics_dict['recall']}  f1_score: {test_metrics_dict['f1']}")
-  print("Confusion Matrix:")
-
-  plt.figure(figsize=(6, 5))
-  sns.heatmap(cm_df, annot=True, fmt="d", cmap="Purples")
-  plt.title("Confusion Matrix")
-  plt.ylabel("True Label")
-  plt.xlabel("Predicted Label")
-  plt.tight_layout()
-  plt.savefig("/.confusion_matrix.png") 
+    plt.figure(figsize=(6, 5))
+    sns.heatmap(cm_df, annot=True, fmt="d", cmap="Purples")
+    plt.title("Confusion Matrix")
+    plt.ylabel("True Label")
+    plt.xlabel("Predicted Label")
+    plt.tight_layout()
+    plt.savefig("/.confusion_matrix.png") 

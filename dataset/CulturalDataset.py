@@ -1,7 +1,7 @@
 from torch.utils.data import Dataset
 
 class CulturalDataset(Dataset):
-  def __init__(self, dataset, tokenizer, max_length, text_type='ND'):
+  def __init__(self, dataset, tokenizer, max_length, text_type='ND', labels_flag=False):
     super(CulturalDataset, self).__init__()
 
     self.dataset = dataset # Pandas dataframe with cultural data
@@ -11,6 +11,8 @@ class CulturalDataset(Dataset):
     # ('ND' [Name and Description], 'NDV' [Name, Description, Views], 'NDVS' [Name, Description, Views and Summary])
     # Views are the wikipedia page views, while Summary is a Wikipedia page summary
     self.text_type = text_type 
+    # Flag to check if the dataset has labels or not
+    self.labels_flag = labels_flag
 
   def __len__(self):
     return len(self.dataset)
@@ -26,13 +28,16 @@ class CulturalDataset(Dataset):
     elif self.text_type == 'NDVS':
       text = f"Name: {item['name']}. Description: {item['description']}. Views: {item['en_wikipedia_views']}. Summary: {item['en_wikipedia_summary']}"
 
-    # Put label as 0,1,2
-    if item['label'] == 'cultural agnostic':
-      label = 0
-    elif item['label'] == 'cultural representative':
-      label = 1
+    if self.labels_flag == True:
+      # Put label as 0,1,2
+      if item['label'] == 'cultural agnostic':
+        label = 0
+      elif item['label'] == 'cultural representative':
+        label = 1
+      else:
+        label = 2
     else:
-      label = 2
+      label = -1 # Dummy value for the label 
 
     # Tokenization
     # The tokenizer having a text returns:
