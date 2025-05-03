@@ -379,10 +379,10 @@ def clean_df(df):
     original_qids = set(df['qid'])
 
     # Remove rows with any missing values
-    my_train_df = df.dropna()
+    df = df.dropna()
 
     # Get the 'qid' values after dropping rows
-    remaining_qids = set(my_train_df['qid'])
+    remaining_qids = set(df['qid'])
 
     # Find the difference to get the removed 'qid' values
     removed_qids = original_qids - remaining_qids
@@ -390,7 +390,9 @@ def clean_df(df):
 
     df = df.copy()  # removes a warning by pandas
     for column in df.select_dtypes(include=['float64']).columns:
-        my_train_df[column] = df[column].astype(int)
+        df[column] = df[column].astype(int)
+        
+    return df
 
 def process_df(df, path = None, labels_flag = False):
     """
