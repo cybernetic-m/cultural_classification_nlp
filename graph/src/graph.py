@@ -23,7 +23,7 @@ def make_graph(G, df, add_label):
   make_nodes_by_val = ['en', 'total_views']
   # value to split the make_nodes_by_val, 2000 = if en has value 2300 it will be connected to the node en_2000, if it has value 500 it will be connected to the node en_0
   # en_0 will be a node where the elements with en values from ' to 1999 will be connected
-  split_val = 2000
+  split_val = 1000
   #binary_props = set(binary_props)
 
   # check for missing columns

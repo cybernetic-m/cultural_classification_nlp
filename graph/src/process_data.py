@@ -370,6 +370,27 @@ def merge_p_language(lang_df, p_df):
 
     return pd.merge(lang_df, my_df_p, on='qid', how='left')
 
+def clean_df(df):
+    """
+    Cleans the df, this was needed after wikidata removed an element on april 17
+    sometimes we may get float values in the df, we also convert them to int here
+    """
+    # Get the 'qid' values before dropping rows
+    original_qids = set(df['qid'])
+
+    # Remove rows with any missing values
+    my_train_df = df.dropna()
+
+    # Get the 'qid' values after dropping rows
+    remaining_qids = set(my_train_df['qid'])
+
+    # Find the difference to get the removed 'qid' values
+    removed_qids = original_qids - remaining_qids
+    print("Removed qids:", removed_qids)
+
+    df = df.copy()  # removes a warning by pandas
+    for column in df.select_dtypes(include=['float64']).columns:
+        my_train_df[column] = df[column].astype(int)
 
 def process_df(df, path = None, labels_flag = False):
     """
@@ -405,4 +426,4 @@ def process_df(df, path = None, labels_flag = False):
 
     final_df = merge_p_language(merged_df, my_df_P)
 
-    return final_df
+    return clean_df(final_df)
