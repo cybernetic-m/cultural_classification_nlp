@@ -276,7 +276,6 @@ def parse_df_languages(df, labels_flag = False):
         else:
             # Initialize the pageview dictionary for the current QID without a class label
             language_pageview_data[qid] = {}
-            print(f'made data of {qid}')
 
         try:
             item = client.get(qid, load=True)
@@ -305,6 +304,7 @@ def parse_df_languages(df, labels_flag = False):
                     if views > 0:
                         language_pageview_data[qid][lang] = views
                         all_languages.add(lang)
+                        print(f'adding data of {qid}')
                 except Exception as exc:
                     print(f"Errore durante il recupero di {lang}: {exc}")
 
