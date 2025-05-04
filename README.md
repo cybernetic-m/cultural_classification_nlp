@@ -3,7 +3,7 @@ The task of this homework consists in developing a non LM-based and an LM-based 
 
 <img src="./images/image_1.png" alt="Description" width="600" height = "400" />
 
-# TAs Instructions
+# ⚠️TAs Instructions⚠️
 
 1. **Clone the repository**:  
  ```sh 
@@ -12,22 +12,32 @@ The task of this homework consists in developing a non LM-based and an LM-based 
 2. **Re-Train the Non LM model**:
    
 You can try to create a graph using the notebook "non_lm_based.ipynb".
-  
-  - Open the notebook on Google Colab
+
+  - Open the folder of the repository
+  - Upload the notebook on Google Colab
+  - Follow the instructions (in the download of the dataset step you need to login using an Hugging Face Token)
    
 3. **Re-Train the LM model**:
    
 You can try to do the Transformer Encoder training using the notebook "lm_based.ipynb".
 
+  - Open the folder of the repository
+  - Upload the notebook on Google Colab
+  - Follow the instructions (in the download of the dataset step you need to login using an Hugging Face Token)
+
 4. **Test both models**:
    
 You can test both models on the "test_unlabeled.csv" dataset using the notebook "hw1_romano_lissalattanzio.ipynb"
+
+  - Open the folder of the repository
+  - Upload the notebook on Google Colab
+  - Follow the instructions (you need to upload the "test_unlabeled.csv" file into the Files section of Colab)
 
 5. **Report reading**:
 
 You can read the report "*Report_HW1_NLP_Romano_LissaLattanzio.pdf*".
 
-# TAs GDrive Shared Folder
+# ☁️ TAs GDrive Shared Folder ☁️
 
 On the [Caponata_Lovers_shared_folder ](https://drive.google.com/drive/folders/1-i65074543er1y3tjMLZVbvj1Wa4dZ1Q?usp=drive_link)  you can see different files:
 
