@@ -302,10 +302,6 @@ def parse_df_languages(df, labels_flag = False):
                     lang, views = future.result()
                     if views > 0:
                         language_pageview_data[qid][lang] = views
-                    else:
-
-                        print(f' - error views for {qid} - {lang} - {views}')
-                        language_pageview_data[qid][lang] = -1
 
                 except Exception as exc:
                     print(f"Errore durante il recupero di {lang}: {exc}")
