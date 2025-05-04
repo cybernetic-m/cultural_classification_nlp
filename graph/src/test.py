@@ -150,7 +150,7 @@ def eval_non_lm(dataset_csv, path = './models', print_statistics = False):
     # Add the column with the labels to the predictions dataframe
     df['label'] = column_to_add
 
-    print(f"lunghezza x test: {len(X_test)}, y test {len(y_test)}, col to add: {column_to_add}")
+    #print(f"lunghezza x test: {len(X_test)}, y test {len(y_test)}, col to add: {column_to_add}")
     #predictions_df = predictions_df.merge(df, on='qid', how='left')
     # print(f'accuracy sul test: {acc}')
     # predictions_df.head()
