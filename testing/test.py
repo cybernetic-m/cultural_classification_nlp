@@ -111,7 +111,7 @@ def eval_lm(model, model_path, dataset_csv, tokenizer, batch_size, max_length, t
   model.eval()
   
   # Values to Label
-  val_to_lab = {0: 'cultural agnostic', 1: 'cultural representative.', 2: 'cultural exclusive'}
+  val_to_lab = {0: 'cultural agnostic', 1: 'cultural representative', 2: 'cultural exclusive'}
 
   if not os.path.exists(dataset_csv):
     print("No dataset provided.\nPlease load it in a csv format into the 'Files' section of colab.\nAfter this, run another time the cells of 'Load of the dataset'.")
