@@ -265,7 +265,6 @@ def parse_df_languages(df, labels_flag = False):
     client = Client()
     language_pageview_data = {}
     labels_to_int = {"cultural exclusive": 0, "cultural representative": 1, "cultural agnostic": 2}
-    all_languages = set()
     for idx, row in tqdm(df.iterrows(), total=len(df), desc='Parsing languages...'):
         qid = row['item'].split('/')[-1]
 
@@ -303,8 +302,11 @@ def parse_df_languages(df, labels_flag = False):
                     lang, views = future.result()
                     if views > 0:
                         language_pageview_data[qid][lang] = views
-                        all_languages.add(lang)
-                        print(f' - adding data of {qid}{lang}{views}')
+                    else:
+
+                        print(f' - error views for {qid} - {lang} - {views}')
+                        language_pageview_data[qid][lang] = -1
+
                 except Exception as exc:
                     print(f"Errore durante il recupero di {lang}: {exc}")
 
@@ -314,7 +316,7 @@ def parse_df_languages(df, labels_flag = False):
     output_df.index.name = 'qid'
     output_df = output_df.reset_index()
 
-    output_df.head()
+    print(output_df.head())
     return output_df
 
 
