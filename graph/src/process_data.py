@@ -391,7 +391,7 @@ def clean_df(df):
     df = df.copy()  # removes a warning by pandas
     for column in df.select_dtypes(include=['float64']).columns:
         df[column] = df[column].astype(int)
-        
+
     return df
 
 def process_df(df, path = None, labels_flag = False):

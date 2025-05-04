@@ -9,6 +9,15 @@ import numpy as np
 import time
 import wikipedia
 
+def id2string(id_, client):
+    element_ = client.get(id_, load=True)
+    label = element_.label.get('en', '')
+    return label
+
+def print_labels_counts(my_df, property_id):
+  country_df = my_df[my_df[property_id] == 1]  # Select rows where the "country" property is present (1 in one-hot encoding)
+  label_counts = country_df.groupby('label')['label'].count()
+  print('     -', label_counts)
 
 def dict_save_and_load(mydict, path, todo):
 
