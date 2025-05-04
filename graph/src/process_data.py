@@ -276,6 +276,7 @@ def parse_df_languages(df, labels_flag = False):
         else:
             # Initialize the pageview dictionary for the current QID without a class label
             language_pageview_data[qid] = {}
+            print(f'made data of {qid}')
 
         try:
             item = client.get(qid, load=True)
