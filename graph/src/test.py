@@ -148,11 +148,8 @@ def eval_non_lm(dataset_csv, path = './models', print_statistics = False):
     # returns a df with qid and predictions, the last param indicates to not print the confusion matrix
     predictions_df, column_to_add = test(A, y, node_idx, X_test, y_test, 'knn', 10, 10, print_statistics, labels_flag=labels_flag)
     # Add the column with the labels to the predictions dataframe
-    df['label'] = column_to_add
-
-    #print(f"lunghezza x test: {len(X_test)}, y test {len(y_test)}, col to add: {column_to_add}")
-    #predictions_df = predictions_df.merge(df, on='qid', how='left')
-    # print(f'accuracy sul test: {acc}')
-    # predictions_df.head()
+    qid_to_label = dict(zip(predictions_df['qid'], column_to_add))
+    df['label'] = df['qid'].map(qid_to_label)
+    
     df.to_csv('nonLM_predictions.csv', index=False)
     return predictions_df, my_test_df
