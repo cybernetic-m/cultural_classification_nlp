@@ -285,6 +285,10 @@ def parse_df_languages(df, labels_flag = False):
 
         labels = item.data.get("labels", {})  # Get all available language labels
 
+        if not labels:
+            print(f" - Warning : {qid} has no languages associated.")
+            #continue
+
 
 
         with ThreadPoolExecutor(max_workers=16) as executor:
@@ -415,8 +419,8 @@ def process_df(df, path = None, labels_flag = False):
     print('Parsing languages')
     my_df_lang = parse_df_languages(df, labels_flag)  # get languages
 
-    my_df_P.to_csv('dataframe_P.csv', index=False)
-    my_df_lang.to_csv('dataframe_lang.csv', index=False)
+    #my_df_P.to_csv('dataframe_P.csv', index=False)
+    #my_df_lang.to_csv('dataframe_lang.csv', index=False)
 
     if labels_flag:
         my_df_lang['total_views'] = my_df_lang.drop(columns=['label', 'qid']).sum(axis=1)
