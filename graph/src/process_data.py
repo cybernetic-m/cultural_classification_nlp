@@ -304,7 +304,7 @@ def parse_df_languages(df, labels_flag = False):
                     if views > 0:
                         language_pageview_data[qid][lang] = views
                         all_languages.add(lang)
-                        print(f'adding data of {qid}')
+                        print(f' - adding data of {qid}{lang}{views}')
                 except Exception as exc:
                     print(f"Errore durante il recupero di {lang}: {exc}")
 
@@ -314,6 +314,7 @@ def parse_df_languages(df, labels_flag = False):
     output_df.index.name = 'qid'
     output_df = output_df.reset_index()
 
+    output_df.head()
     return output_df
 
 
