@@ -314,7 +314,7 @@ def parse_df_languages(df, labels_flag = False):
     output_df.index.name = 'qid'
     output_df = output_df.reset_index()
 
-    print(output_df.head())
+    #print(output_df.head())
     return output_df
 
 
