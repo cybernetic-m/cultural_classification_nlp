@@ -1,7 +1,6 @@
 # Cultural Classification
 The task of this homework consists in developing a non LM-based and an LM-based method for cultural classification among three classes: C.A. (cultural agnostic), C.R. (cultural representative) and C.E. (cultural exclusive). 
 
-<img src="./images/image_1.png" alt="Description" width="600" height = "400" />
 
 # ⚠️TAs Instructions⚠️
 
